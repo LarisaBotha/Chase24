@@ -13,7 +13,7 @@ import TopPlayer from '../components/TopPlayer.astro';
         otherPlayers: [], 
         connectWebSocket() {
           // Initialize WebSocket connection
-          this.websocket = new WebSocket(`ws://localhost:8080?session_key=${this.sessionKey}`);
+          this.websocket = new WebSocket(`ws://${this.apiUrl}?session_key=${this.sessionKey}`);
 
           // Handle incoming messages
           this.websocket.onmessage = (event) => {
@@ -45,7 +45,7 @@ import TopPlayer from '../components/TopPlayer.astro';
           console.log('Session Key:', sessionKey);
 
           // Fetch players data using the session key
-          fetch(`http://localhost:8080/api/players/AllForSessionSorted?session_key=${sessionKey}`)
+          fetch(`https://${this.apiUrl}/api/players/AllForSessionSorted?session_key=${sessionKey}`)
             .then(response => {
               if (!response.ok) throw new Error('Failed to fetch player data');
               return response.json();

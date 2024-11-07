@@ -1,5 +1,6 @@
 ---
 const { title, background = "bg-[#e5dbc0]" } = Astro.props;
+const apiUrl = import.meta.env.VITE_API_URL;
 ---
 
 <!DOCTYPE html>
@@ -10,7 +11,10 @@ const { title, background = "bg-[#e5dbc0]" } = Astro.props;
     <title>{title}</title>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   </head>
-  <body class=`${background} min-h-screen overflow-auto flex items-center justify-center` >
+  <body 
+    x-data=`{ apiUrl: "${apiUrl}", }` 
+    class=`${background} min-h-screen overflow-auto flex items-center justify-center` 
+  >
     <slot />
   </body>
 </html>
