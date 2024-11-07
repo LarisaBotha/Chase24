@@ -1,0 +1,129 @@
+---
+---
+
+<div 
+    x-data="{
+        registeredPlayersDuplicate: [],
+        selectedPlayers: [-1, -1],
+        showCheckbox: false,
+        alsoRivals: false,
+
+        addDropdown() {
+          this.selectedPlayers.push(-1);
+        },
+
+        createDriverGroup() {
+          if (this.selectedPlayers[0] !== -1 && this.selectedPlayers[1] !== -1) {
+            this.driverGroups.push(this.selectedPlayers);
+            // Remove both selected players from the duplicate array
+            // this.selectedPlayers.forEach((player) => {
+            //   const index = this.registeredPlayersDuplicate.indexOf(player);
+            //   if (index > -1) {
+            //     this.registeredPlayersDuplicate.splice(index, 1);
+            //   }
+            // });
+            this.selectedPlayers = [-1, -1];
+            this.showCheckbox = true;
+          }
+        },
+
+        done() {
+          if(this.alsoRivals) {
+            this.driverGroups.forEach((group, index, array) => {
+              // TODO
+              if(group.length == 2) {
+                this.rivals.push(group);
+              }   
+            });
+          };
+          this.goToNextCard();
+        }
+    }"
+    class="w-1/2 mx-auto bg-white shadow-md rounded-xl p-6"
+>
+
+    <!-- Dropdown for Selecting Drivers -->
+    <div class="mb-4">
+      <h3 class="text-gray-700 text-lg font-bold mb-2">Select Drivers</h3>
+      <template x-for="(selectedPlayer, index) in selectedPlayers" :key="index">
+        <div class="mb-2">
+          <select 
+            x-model="selectedPlayers[index]" 
+            class="w-full p-3 border border-gray-300 rounded-lg"
+            >
+              <option disabled value="-1">Select Player</option>
+              <template x-for="(player, index) in registeredPlayers" :key="index">
+                <option :value="index" x-text="player.name"/>
+              </template>
+          </select>
+        </div>
+      </template>
+      
+      <!-- Add Dropdown Button -->
+      <div class="w-full flex justify-end">
+        <button 
+            @click="addDropdown"
+            class="w-5 bg-blue-500 text-white font-bold p-2 rounded-full text-center flex items-center justify-center"
+            style="height: auto; aspect-ratio: 1/1;"
+        >
+        <svg class="w-full h-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 12H18M12 6V18" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Add Driver Group Button -->
+    <div class="mb-4">
+      <button
+        @click="createDriverGroup"
+        class="w-full bg-[#b7519d] text-white p-3 rounded-lg font-bold hover:bg-[#9E3E85]"
+      >
+        Add Driver Group
+      </button>
+    </div>
+
+    <!-- Display Driver Groups -->
+    <template x-if="driverGroups.length > 0">
+      <div class="mb-4">
+        <h3 class="text-gray-700 text-lg font-bold mb-2">Driver Groups</h3>
+        <div class="flex flex-wrap gap-4">
+          <template x-for="(group, index) in driverGroups" :key="index">
+            <div 
+              class="relative p-4 bg-gray-200 rounded-lg flex-grow"
+            >
+              <!-- Top Right Number -->
+              <div class="absolute top-2 right-2 bg-[#ff84cd] text-white font-bold w-6 h-6 rounded-full flex items-center justify-center">
+                <span x-text="index + 1"></span>
+              </div>
+              <!-- Driver Names -->
+              <div>
+                <ul class=" list-inside">
+                  <template x-for="driver in group" :key="driver">
+                    <li x-text="registeredPlayers[driver].name" class="text-gray-700"></li>
+                  </template>
+                </ul>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>    
+    
+    <!-- Checkbox and Next Button -->
+    <template x-if="showCheckbox">
+      <div class="mb-4">
+        <input x-model="alsoRivals" type="checkbox" id="confirm" class="mr-2" />
+        <label for="confirm" class="text-gray-700">Register as Rivals</label>
+      </div>
+    </template>
+    
+    <div class="flex justify-end">
+      <button
+        @click="done"
+        class="bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600"
+      >
+        Next
+      </button>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+---
+
+---
+
+<div 
+    x-ref="parent"
+    :class="{ 'order-2': index === 0,'order-1': index === 1, 'order-3': index === 2}"
+    class="w-1/4 h-auto flex-col justify-start items-center inline-flex"
+>
+    <!-- Image and Name Container -->
+    <div class="self-stretch flex flex-col justify-start items-start 
+                p-2 sm:p-3 md:p-3 lg:p-4 xl:p-5
+                gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5">
+        <!-- Image Placeholder -->
+        <div 
+            class="w-full rounded-full border border-white/60"
+            style="height: auto; aspect-ratio: 1/1;"
+        >   
+            <img
+            :src="player.avatar"
+            alt="Avatar"
+            class="w-full rounded-full"
+            style="aspect-ratio: 1/1;"
+            />
+        </div>
+        <!-- Player Name -->
+        <div class="w-full flex-col justify-start items-center flex">
+            <span 
+                class="text-[#451c3a] font-semibold font-['Inter']
+                       text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl"
+                x-text = "player.name"
+            />
+        </div>
+    </div>
+    <!-- Point Container (Actually Unneccessary)-->
+    <div class="w-full flex flex-col justify-start items-center 
+                px-4 sm:px-5 md:px-6 lg:px-7 xl:px-8
+                pb-2 sm:pb-3 md:pb-4 lg:pb-5 xl:pb-6">
+        <!-- Point Bubble -->
+        <div 
+            class="w-full bg-[#f9ec7a] rounded-full justify-center items-start inline-flex
+                   py-0.5 sm:py-0.5 md:py-1 lg:py-2.5 xl:py-3"
+            style="height: auto; aspect-ratio: 6/1;"
+        >
+            <span 
+                class="text-black font-normal font-['Inter']
+                       text-sm sm:text-reg md:text-lg lg:text-xl xl:text-2xl"
+                x-text="player.total_score + ' pts'"
+            />
+        </div>
+    </div>
+    <!-- Podium Container -->
+    <div
+        class="w-full"
+        :style="`height: auto; aspect-ratio: 1/${1.5 - 0.3*(index)};`" 
+    >
+        <!-- Podium Top -->
+        <div
+            class="w-full h-auto bg-[#D562AD]"
+            :style="`clip-path: ${index === 0 ? 'polygon(0 100%, 100% 100%, 90% 0, 10% 0)' : index === 1 ? 'polygon(0 100%, 100% 100%, 100% 0, 10% 0)' : 'polygon(0 100%, 100% 100%, 90% 0, 0% 0)'}; aspect-ratio: 4/1;`"
+        />
+        <!-- Podium Front -->
+        <div 
+            :class="{'bg-gradient-to-t from-[#D562AD] via-[#D562AD] to-[#b7519d]': index === 0}"
+            class = "w-full h-full bg-[#b7519d] flex-col justify-start items-center flex"
+        >
+            <span 
+                class="text-white text-center font-bold font-['Joti One']
+                       text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-10xl" 
+                :class="`${index === 0 ? 'pt-8' : index === 1 ? 'pt-6' : 'pt-3'}`"
+                x-text = "index + 1"
+            />
+        </div>
+    </div>
+</div>

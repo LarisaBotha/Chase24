@@ -1,0 +1,195 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TeamCard from '../components/TeamCard.astro';
+---
+
+<Layout title="Chase 24 - Dashboard">
+    <div 
+        class="w-2/3 flex items-center justify-center"
+        x-data="{
+            sessionKey: '',
+            teams: [],
+            teamsStatic: [],
+            teamsDynamic: [],
+            players: [],
+            legs: [],
+            legsStatic: [],
+            legsDynamic: [],
+            player_teams: [],
+            leg_number: 0,
+            timerStarted: false,    // Controls the visibility of the timer
+            timer: 0, 
+            timestamp: null,
+            
+            timerSetup(initVal=0) {
+                this.timerStarted = true;
+                this.timestamp = initVal;
+            },
+
+            nextLeg() {
+                if(this.leg_number <= this.legsStatic.length) {
+                    this.leg_number++;
+                }
+                this.timerStarted = false;
+                if (this.legsDynamic[this.leg_number].started) {
+                    this.timerSetup(this.legsDynamic[this.leg_number].started);
+                }
+            },
+
+            formatTime() {
+                const totalSeconds = Math.floor(this.timer); // Total seconds as an integer
+                const hours = Math.floor(totalSeconds / 3600); // Calculate hours
+                const minutes = Math.floor((totalSeconds % 3600) / 60); // Calculate minutes
+                const seconds = totalSeconds % 60; // Calculate remaining seconds
+
+                // Pad minutes and seconds with leading zeros
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            },
+
+            allTeamsStopped() {
+                // Get the number of teams in the current leg
+                let start = 0;
+                let end = 0;
+                if(this.player_teams[this.leg_number]){
+                start = this.leg_number * this.player_teams[this.leg_number].length;
+                end = start + this.player_teams[this.leg_number].length;
+                }
+
+                // Check if all teams in the current leg have an `end_time`
+                return this.teamsDynamic.slice(start, end).every(team => team.end_time);
+            },
+
+            async startTimer() {
+                try {
+                    const response = await fetch('http://localhost:8080/api/legs/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({leg_id: this.legsStatic[this.leg_number].id}) // Convert the request body to JSON
+                });
+                    
+                    if (response.ok) {
+                        this.timerSetup();
+                        let temp = this.player_teams[this.leg_number].length;
+                        let start = this.leg_number*temp
+                        for (let team_index = start; team_index < start + temp; team_index++) {
+                            this.teamsDynamic[team_index].task_count = 1;
+                        }
+                    } else {
+                        console.log('Something went wrong');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            },
+
+            stopTimer() {
+                // clearInterval(this.timerInterval);
+                // this.timerInterval = null;
+                // $dispatch('stop-timer');
+            },
+
+            async fetchTeams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                this.sessionKey = urlParams.get('session_key'); // Retrieves the session_key from the URL
+                
+                try {
+                    const response = await fetch(`http://localhost:8080/api/teams/AllForSession?session_key=${this.sessionKey}`, {
+                        method: 'GET'
+                    });
+                    
+                    if (response.ok) {
+                        const responseData = await response.json()
+                        // this.teams = responseData.teams;
+                        this.teamsStatic = responseData.teams.map(team => ({
+                            id: team.id,
+                            name: team.name
+                        }));
+                        
+                        this.teamsDynamic = responseData.teams.map(team => ({
+                            task_count: team.task_count,
+                            end_time: team.end_time
+                        }));
+                        this.players = responseData.players;
+                        // this.legs = responseData.legs;
+                        this.legsStatic = responseData.legs.map(leg => ({
+                            id: leg.id,
+                            name: leg.name
+                        }));
+                        
+                        this.legsDynamic = responseData.legs.map(leg => ({
+                            tasks: leg.tasks,
+                            started: leg.started
+                        }));
+                        this.player_teams = responseData.playerteams;
+                        if (this.legsDynamic[this.leg_number].started) {
+                            this.timerSetup(this.legsDynamic[this.leg_number].started);
+                        }
+                    } else {
+                        console.log('Something went wrong');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            },
+        }"
+        x-init="fetchTeams"
+        x-effect="this.timer = Math.floor((Date.now() - this.timestamp) / 1000)"
+    >
+        <div class="w-full max-w-md flex flex-col justify-center items-center">
+            <!-- Timer Container to keep the rest of the components from re-rendering -->
+            <div class="w-full" >
+                <!-- Start Button -->
+                <button
+                    x-show="!timerStarted"
+                    @click="startTimer"
+                    class="w-full bg-green-500 text-white py-3 text-lg font-bold rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none"
+                >
+                    Start
+                </button>
+
+                <!-- Timer Display -->
+                <div 
+                    x-show="timerStarted" 
+                    class="w-full bg-[#D562AD] rounded-full justify-center items-center 
+                           p-2 xs:p-2 sm:p-3 md:p-3 lg:p-3 xl:p-3"
+                >
+                    <div class="font-semibold text-white text-center 
+                                text-4xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-6xl">
+                        <span x-text="formatTime()"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leg Name -->
+            <div 
+                class="text-center font-bold text-gray-800 
+                       mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6
+                       text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl" 
+                x-text="legsStatic && legsStatic[leg_number] ? legsStatic[leg_number].name : ''" 
+            />
+
+            <!-- Team Cards List -->
+            <div 
+                class="flex flex-col 
+                       gap-3 xs:gap-3 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-5
+                       mt-2 xs:mt-2 sm:mt-3 md:mt-3 lg:mt-4 xl:mt-4" 
+                x-show="player_teams[leg_number] && player_teams[leg_number].length > 0">
+                <template x-for="(team, team_index) in player_teams[leg_number]" :key="leg_number*player_teams[leg_number].length+team_index">
+                    <TeamCard />
+                </template>
+            </div>
+
+            <!-- Next leg Button -->
+            <button
+            x-show="allTeamsStopped"
+            @click="nextLeg"
+            class="w-full bg-green-500 text-white py-3 text-lg font-bold rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none 
+                   mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6"
+            >
+                Next Leg
+            </button>
+        </div>
+    </div>
+</Layout>

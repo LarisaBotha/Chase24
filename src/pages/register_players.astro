@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AddPlayers from '../components/AddPlayers.astro';
+import RegisterDrivers from '../components/RegisterDrivers.astro';
+import Rivals from '../components/Rivals.astro';
+import Names from '../components/Names.astro';
+---
+
+<Layout title="Chase 24 - Register">
+    <div 
+        x-data="{
+            currentCard: 1,
+
+            registeredPlayers: [],
+            driverGroups: [],
+            rivals: [],
+
+            goToNextCard() {
+                this.currentCard += 1;
+            }
+        }"
+        class="fixed inset-0 flex justify-center items-center min-h-screen"
+        x-cloak
+    >
+        <!-- I used the x-if display instead of x-show so that I can use x-init -->
+        <!-- Add Players Card -->
+        <template x-if="currentCard === 1">
+            <AddPlayers @next="goToNextCard" />
+        </template>
+
+        <!-- Register Drivers Card -->
+        <template x-if="currentCard === 2">
+            <RegisterDrivers @next="goToNextCard" />
+        </template>
+
+        <!-- Rivals Card -->
+        <template x-if="currentCard === 3">
+            <Rivals @next="goToNextCard" />
+        </template>
+
+        <!-- Names Card -->
+        <template x-if="currentCard === 4">
+            <Names @next="goToNextCard" />
+        </template>
+    </div>
+</Layout>

@@ -1,0 +1,53 @@
+---
+import SessionModal from '../components/SessionModal.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Chase24">
+
+	<div 
+		x-data="{ open: false }" 
+		class="w-full h-full flex flex-col justify-center items-center gap-8 p-8"
+	>
+		<!-- Coordinator Card -->
+		<div class="bg-[#ff84cd] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
+			<span class="text-white text-2xl font-semibold font-['Braah One']">
+				COORDINATOR
+			</span>
+			<div class="flex items-center gap-4">
+				<form action="/register_players" method="get" class="bg-[#9e3e85] rounded-lg px-4 py-2">
+					<button class="text-white text-xl font-semibold font-['Braah One']">
+						CREATE
+					</button>
+				</form>
+				<span class="text-[#451c3a] text-xl font-semibold font-['Braah One']">
+					OR
+				</span>
+				<div class="bg-[#9e3e85] rounded-lg px-4 py-2">
+					<button class="text-white text-xl font-semibold font-['Braah One']">
+						JOIN
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Player Card -->
+		<div class="bg-[#ff84cd] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
+			<span class="text-white text-2xl font-semibold font-['Braah One']">
+				PLAYER
+			</span>
+			<div class="bg-[#9e3e85] rounded-lg px-4 py-2">
+				<button 
+					class="text-white text-xl font-semibold font-['Braah One'] drop-shadow-lg" 
+					@click="open = true"
+				>
+					JOIN SESSION
+				</button>
+			</div>
+		</div>
+
+		<!-- Modal -->
+		<SessionModal />
+	</div>
+
+</Layout>

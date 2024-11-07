@@ -1,0 +1,106 @@
+---
+---
+
+<div 
+  x-data="{
+        playerName: '',
+        selectedAvatar: null,
+        avatars: [
+          'avatars/avatar1.png',
+          'avatars/avatar2.png',
+          'avatars/avatar3.png',
+          'avatars/avatar4.png',
+          'avatars/avatar5.png',
+          'avatars/avatar6.png',
+          'avatars/avatar7.png',
+          'avatars/avatar8.png',
+          'avatars/avatar9.png',
+        ],
+
+        resetSelectedAvatar() {
+          this.selectedAvatar =  this.avatars.length > 0 ? this.avatars[0] : null;
+        },
+
+        registerPlayer() {
+          if (this.playerName && this.selectedAvatar) {
+              this.registeredPlayers.push({
+              name: this.playerName,
+              avatar: this.selectedAvatar
+              });
+              this.avatars.splice(this.avatars.indexOf(this.selectedAvatar), 1);
+              this.playerName = ''; // Reset player name
+              this.resetSelectedAvatar();
+          }
+        }
+  }" 
+  class="w-1/2 max-w-md mx-auto bg-white shadow-md rounded-xl p-6"
+  x-init="resetSelectedAvatar()"
+>
+    <!-- Input Field for Player Name -->
+    <div class="mb-4">
+      <label for="playerName" class="block text-gray-700 text-sm font-bold mb-2">Player Name</label>
+      <input
+        id="playerName"
+        type="text"
+        x-model="playerName"
+        placeholder="Enter player name"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+      />
+    </div>
+  
+    <!-- Avatar Selection -->
+    <div class="mb-4">
+      <p class="block text-gray-700 text-sm font-bold mb-2">Choose an Avatar</p>
+      <div class="flex flex-wrap space-x-1">
+        <template x-for="(avatar, index) in avatars" :key="index">
+            <div class="flex-shrink-0 w-1/6">
+                <img
+                    :src="avatar"
+                    alt="Avatar"
+                    class="w-10 rounded-full border-2 cursor-pointer"
+                    style="height: auto; aspect-ratio: 1/1;"
+                    :class="selectedAvatar === avatar ? 'border-[#b7519d]' : 'border-transparent'"
+                    @click="selectedAvatar = avatar"
+                />
+            </div>
+        </template>
+      </div>
+    </div>
+  
+    <!-- Register Player Button -->
+    <div class="mb-4">
+      <button
+        @click="registerPlayer()"
+        class="w-full bg-[#b7519d] text-white p-3 rounded-lg font-bold hover:bg-[#9E3E85]"
+      >
+        Register Player
+      </button>
+    </div>
+  
+    <!-- View of Registered Players -->
+    <template x-if="registeredPlayers.length > 0">
+      <div class="mb-4">
+        <h3 class="text-gray-700 text-lg font-bold mb-2">Registered Players</h3>
+        <ul>
+          <template x-for="(player, index) in registeredPlayers" :key="index">
+            <li class="flex items-center space-x-3 mb-2">
+              <img :src="player.avatar" alt="Avatar" class="w-8 h-8 rounded-full" />
+              <span x-text="player.name"></span>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </template>
+  
+    <!-- Next Button -->
+    <div class="flex justify-end">
+      <button
+        @click="goToNextCard()"
+        class="bg-green-500 text-white p-3 rounded-lg font-bold hover:bg-green-600"
+      >
+        Next
+      </button>
+    </div>
+</div>
+
+  

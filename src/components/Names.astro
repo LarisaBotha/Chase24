@@ -1,0 +1,151 @@
+<div 
+    x-data="{
+        legName: '',
+        taskCount: 1,
+        teamNames: [],
+        legs: [],
+
+        // Method to add more team input fields
+        addTeamInput() {
+            this.teamNames.push(''); // Push an empty string for each new input field
+        },
+
+        // Method to register the leg and the associated teams
+        registerLeg() {
+            if (this.legName && this.teamNames.length) {
+                this.legs.push({
+                    taskCount: this.taskCount,
+                    legName: this.legName,
+                    teamNames: [...this.teamNames]
+                });
+                this.legName = '';
+                for (let i = 0; i < this.teamNames.length; i++) {
+                    this.teamNames[i] = ''; // Clear the text fields
+                }
+            }
+        },
+
+        initialise() {
+            for (let i = 0; i < this.driverGroups.length; i++) {
+                this.addTeamInput(); // Use this to correctly reference the method
+            }
+        },
+
+        async createSession() {
+            // Create the request body
+            const requestBody = {
+                players: this.registeredPlayers,
+                driver_groups: this.driverGroups,
+                rivalries: this.rivals,
+                legs: this.legs
+            };
+
+            try {
+                // Send a POST request to the server
+                const response = await fetch('http://localhost:8080/api/session/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody) // Convert the request body to JSON
+                });
+
+                // Check if the response was successful
+                if (response.ok) {
+                    const responseData = await response.json()
+
+                    window.location.href = `/dashboard?session_key=${responseData.session_key}`
+                } else
+                {
+                    console.log('Something went wrong')
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    }"
+    class="w-full flex flex-col items-center gap-4 p-4"
+    x-init = "initialise"
+>
+    <!-- Leg Registration Card -->
+    <div class="w-full max-w-md bg-white p-4 rounded-lg drop-shadow-lg">
+        <h3 class="text-gray-700 text-xl font-bold mb-4">Register Leg and Teams</h3>
+        
+        <!-- Section for Leg Name -->
+        <h4 class="text-gray-600 font-semibold mb-2">Leg Name</h4>
+        <input 
+            x-model="legName" 
+            type="text" 
+            class="w-full p-2 mb-4 border border-gray-300 rounded" 
+            placeholder="Enter Leg Name"
+        >
+        
+        <!-- Section for Team Names -->
+        <h4 class="text-gray-600 font-semibold mb-2">Team Names</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">  
+            <template x-for="(team, index) in teamNames" :key="index">
+                <input 
+                    x-model="teamNames[index]" 
+                    type="text" 
+                    class="flex flex-col p-2 border border-gray-300 rounded" 
+                    :placeholder="'Enter Team Name ' + (index + 1)"
+                >
+            </template>
+        </div> 
+
+        <!-- Button to add more team input fields -->
+        <button 
+            @click="addTeamInput"
+            class="flex items-center justify-center w-10 h-10 mb-4 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+        >
+            <span class="text-xl font-bold">+</span>
+        </button>
+
+         <!-- Challenges in leg -->
+        <input 
+            x-model="taskCount"
+            type="number" 
+            class="w-full px-4 py-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focs:ring-blue-500 focus:border-blue-500" 
+            placeholder="Enter a number"/>
+        
+        <!-- Register Leg Button -->
+        <button 
+            @click="registerLeg"
+            class="w-full bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 font-bold mb-2">
+            Register Leg
+        </button>
+
+        <!-- Display Registered Legs and Teams on the Card -->
+        <template x-if="legNames.length > 0">
+            <div class="w-full max-w-md mt-4">
+                <h3 class="text-gray-700 text-lg font-bold mb-2">Registered Legs and Teams</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <template x-for="(leg, index) in legNames" :key="index">
+                        <div class="relative p-4 bg-gray-200 rounded-lg flex flex-col">
+                            <!-- Top Right Number -->
+                            <div class="absolute top-2 right-2 bg-blue-500 text-white font-bold w-6 h-6 rounded-full flex items-center justify-center">
+                                <span x-text="index + 1"></span>
+                            </div>
+                            <!-- Leg Name -->
+                            <p class="text-gray-700 font-bold">Leg: <span x-text="leg.legName"></span></p>
+                            <p class="text-gray-700 font-bold">Teams:</p>
+                            <ul class="list-disc ml-5">
+                                <template x-for="(team, idx) in leg.teamNames" :key="idx">
+                                    <li x-text="'Team ' + (idx + 1) + ': ' + team"></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- Done Button -->
+        <button 
+            @click="createSession"
+            class="w-full bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 font-bold">
+            Create Session
+        </button>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+---
+// const { open } = Astro.props;
+---
+
+<div 
+    x-data="{ sessionKey: '' }" 
+    x-show="open" 
+    @click.away="open = false"
+    id="sessionModal" 
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white w-1/3 p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-semibold">
+        Enter Session Key
+    </h2>
+    <div class="mt-4">
+      <label for="sessionKey" class="block text-sm font-medium text-gray-700">
+        Session Key:
+      </label>
+      <input 
+        type="text" 
+        x-model="sessionKey"
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+    </div>
+    <div class="flex justify-end mt-6">
+      <form action="/leaderboard" method="get">
+        <input type="hidden" name="session_key" :value="sessionKey">
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded mr-2">
+            Submit
+        </button>
+      </form>
+      <button class="bg-red-500 text-white px-4 py-2 rounded">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

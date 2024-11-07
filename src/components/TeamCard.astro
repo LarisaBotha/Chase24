@@ -1,0 +1,141 @@
+<div 
+    x-data="{
+        get TeamIndex() {
+            return this.leg_number*this.player_teams[this.leg_number].length+team_index;
+        },
+        get TeamDynamic() {
+            return this.teamsDynamic[this.TeamIndex];
+        },
+        get TeamStatic() {
+            return this.teamsStatic[this.TeamIndex];
+        },
+        get Progress() {
+            return parseInt(this.TeamDynamic.task_count);
+        },
+        get LastLeg() {
+            return this.Progress === parseInt(this.legsDynamic[this.leg_number].tasks)
+        },
+        get TimeString() {
+            const startDate = new Date(this.legsDynamic[this.leg_number].started);
+            const endDate = new Date(this.TeamDynamic.end_time);
+            
+            let diffMs = endDate - startDate;
+            
+            if (diffMs < 0) {
+                throw new Error('End time must be after start time');
+            }
+
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        },
+        async nextTask() {
+            console.log(this.Progress);
+            console.log(this.LastLeg);
+            try {
+                const response = await fetch('http://localhost:8080/api/teams/advance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({team_id: this.TeamStatic.id}) // Convert the request body to JSON
+            });
+                
+                if (response.ok) {
+                    const responseData = await response.json()
+                    this.teamsDynamic[this.leg_number*this.player_teams[this.leg_number].length+team_index].task_count = responseData.team.task_count;
+                } else {
+                    console.log('Something went wrong');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+        async stopTeam() {
+            try {
+                const response = await fetch('http://localhost:8080/api/teams/stop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({team_id: this.teamsStatic[this.TeamIndex].id}) // Convert the request body to JSON
+            });
+                
+                if (response.ok) {
+                    const responseData = await response.json()
+                    this.teamsDynamic[this.leg_number*this.player_teams[this.leg_number].length+team_index].end_time = responseData.team.end_time;
+                } else {
+                    console.log('Something went wrong');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+    }"
+    class="w-full h-auto bg-[#c671a8] justify-start items-start inline-flex 
+            rounded-md sm:rounded-lg lg:rounded-xl
+            p-2 xl:p-4
+            gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2 xl:gap-3"
+>
+    <!-- Challenge Counter -->
+    <div class="self-stretch flex-col justify-center items-center inline-flex
+                p-2 sm:p-3 md:p-4 lg:p-5 xl:p-6 
+                gap-1 sm:gap-1.5 md:gap-2 lg:gap-2.5 xl:gap-3">
+        <template x-for="(n, index) in Array.from({ length: parseInt(legsDynamic[leg_number].tasks) })" :key="index">
+            <div 
+                class="h-1/3 rounded-md" 
+                :class="parseInt(legsDynamic[leg_number].tasks) - index <= Progress ? 'bg-[#f9ec7a]' : 'bg-[#e5dbc0]'" 
+                style="aspect-ratio: 1/1;">
+            </div>
+        </template>
+    </div>
+    <!-- Main Container -->
+    <div class="grow shrink basis-0 self-stretch justify-end items-center gap-2.5 flex">
+        <div class="grow shrink basis-0 self-stretch px-2.5 flex-col justify-start items-start gap-2.5 inline-flex">
+            <!-- Team Name -->
+            <div class="text-white text-sm sm:text-md md:text-lg lg:text-xl xl:text-2xl font-bold" x-text="teamsStatic[TeamIndex].name"/>
+            <!-- Player -->
+            <div class="grow shrink basis-0 justify-start items-start gap-2 inline-flex">
+                <template x-for="player_index in team" :key="players[player_index].id">
+                    <!-- Player Container -->
+                    <div class="w-1/6 flex-col justify-start items-center gap-0.2 inline-flex">
+                        <img
+                            :src="players[player_index].avatar"
+                            alt="Avatar"
+                            class="w-full rounded-full"
+                            style="aspect-ratio: 1/1;"
+                        />
+                        <div class="text-white text-xs sm:text-xs md:text-sm lg:text-md xl:text-lg font-bold" x-text="players[player_index].name"></div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    <!-- Progress Button -->
+    <div x-show="Progress > 0" class="flex items-center ml-4">
+        <button 
+            @click="stopTeam"
+            x-show="LastLeg"
+            class="text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition duration-300"
+            :class="LastLeg && !TeamDynamic.end_time? 'bg-red-600 hover:bg-red-700' : ''" 
+            x-text="TeamDynamic.end_time ? TimeString : 'Stop'"
+        />
+        <button 
+            @click="nextTask"
+            x-show="!LastLeg && !TeamDynamic.end_time"
+        >
+            <template x-for="(n, index) in Array.from({ length: LastLeg ? 0 : Progress })" :key="index">
+                <!-- Chevron SVG with Transform -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
+                    class="bi bi-chevron-right" 
+                    viewBox="0 0 16 16" 
+                >
+                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+                </svg>
+            </template>
+        </button>
+    </div>
+</div>
