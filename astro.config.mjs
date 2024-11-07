@@ -6,6 +6,8 @@ export default defineConfig({
   server: {
     port: 8000,  // Set to your preferred port number
   },
+  
+  output: 'hybrid',
 
   integrations: [tailwind()],
 });
