@@ -12,8 +12,9 @@ import TopPlayer from '../components/TopPlayer.astro';
         topPlayers: [], 
         otherPlayers: [], 
         connectWebSocket() {
+          console.log(this.apiUrl);
           // Initialize WebSocket connection
-          this.websocket = new WebSocket(`ws://${this.apiUrl}?session_key=${this.sessionKey}`);
+          this.websocket = new WebSocket(`wss://${this.apiUrl}?session_key=${this.sessionKey}`);
 
           // Handle incoming messages
           this.websocket.onmessage = (event) => {
@@ -38,11 +39,12 @@ import TopPlayer from '../components/TopPlayer.astro';
           this.websocket.onerror = (error) => {
               console.error('WebSocket error:', error);
           };
-        }
-      }" 
-      x-init="
+        },
+
+        async fetchPlayers() {
           sessionKey = new URLSearchParams(window.location.search).get('session_key');
           console.log('Session Key:', sessionKey);
+          console.log('URL:', this.apiUrl);
 
           // Fetch players data using the session key
           fetch(`https://${this.apiUrl}/api/players/AllForSessionSorted?session_key=${sessionKey}`)
@@ -51,14 +53,17 @@ import TopPlayer from '../components/TopPlayer.astro';
               return response.json();
             })
             .then(data => {
-              players = data; // Assuming the API returns an array of player objects
+              this.players = data; // Assuming the API returns an array of player objects
               // console.log(data)
-              topPlayers = players.slice(0, 3); // Get top 3 players
-              otherPlayers = players.slice(3); // Get remaining players
+              this.topPlayers = this.players.slice(0, 3); // Get top 3 players
+              this.otherPlayers = this.players.slice(3); // Get remaining players
             })
             .catch(error => console.error('Error fetching players:', error));
-
-            connectWebSocket();
+        }
+      }" 
+      x-init=" 
+        fetchPlayers();
+        connectWebSocket();
       "
   >
     <!-- <h1 class="text-3xl font-bold mb-6">Leaderboard for Session: <span x-text="sessionKey"></span></h1> -->

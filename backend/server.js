@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url'; // Required for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const port = 8080;
+const port = process.env.PORT || 8080; 
 const app = express();
 
 // Allow all origins

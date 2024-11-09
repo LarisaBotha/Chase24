@@ -117,11 +117,11 @@
         </button>
 
         <!-- Display Registered Legs and Teams on the Card -->
-        <template x-if="legNames.length > 0">
+        <template x-if="legs.length > 0">
             <div class="w-full max-w-md mt-4">
                 <h3 class="text-gray-700 text-lg font-bold mb-2">Registered Legs and Teams</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <template x-for="(leg, index) in legNames" :key="index">
+                    <template x-for="(leg, index) in legs" :key="index">
                         <div class="relative p-4 bg-gray-200 rounded-lg flex flex-col">
                             <!-- Top Right Number -->
                             <div class="absolute top-2 right-2 bg-blue-500 text-white font-bold w-6 h-6 rounded-full flex items-center justify-center">
