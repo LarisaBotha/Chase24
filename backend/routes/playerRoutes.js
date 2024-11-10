@@ -4,10 +4,8 @@ import pool from '../db.js';
 const router = express.Router();
 
 // Define routes for user-related operations
-router.get('/AllForSessionSorted', async (req, res) => {
+export const fetchSortedPlayersBySession = async (session_key) => {
   try {
-    const { session_key } = req.query;
-
     const result = await pool.query(
       `SELECT players.name, 
               players.avatar,
@@ -28,81 +26,105 @@ router.get('/AllForSessionSorted', async (req, res) => {
 
     const players = result.rows;
 
-    // Process the players into grouped arrays
-    const groupedPlayers = [];
-    let currentGroup = [];
-    let previousScore = null;
+    // console.log('Sorted by score')
+    // console.log(players)
 
+    // Helper Variables
+    let currentGroup = [];
+    let prev = null;
+
+    const ScoreGroupedPlayers = [];
+
+    // Group players array by score
     players.forEach(player => {
-      if (player.total_score === previousScore) {
-        // Add to the current group if score is the same as previous
+      // If it should be part of the current grouping (By Total Score)
+      if (player.total_score === prev) {
         currentGroup.push(player);
       } else {
-        // Push the previous group if it exists, and reset the group
+        // Push the previous group if it exists
         if (currentGroup.length === 1) {
-          groupedPlayers.push(currentGroup[0]); // If only one player in group, add as an object
+          ScoreGroupedPlayers.push(currentGroup[0]); // If only one player in group, add as an object
         } else if (currentGroup.length > 1) {
-          groupedPlayers.push(currentGroup); // If multiple players, add as an array
+          ScoreGroupedPlayers.push(currentGroup); // If multiple players, add as an array
         }
         
         // Start a new group
         currentGroup = [player];
-        previousScore = player.total_score;
+        prev = player.total_score;
       }
     });
 
+    // Push the last group if it exists
     if (currentGroup.length === 1) {
-      groupedPlayers.push(currentGroup[0]); // If only one player in group, add as an object
+      ScoreGroupedPlayers.push(currentGroup[0]); // If only one player in group, add as an object
     } else if (currentGroup.length > 1) {
-      groupedPlayers.push(currentGroup); // If multiple players, add as an array
+      ScoreGroupedPlayers.push(currentGroup); // If multiple players, add as an array
     }
 
-    // Sort each group by taskcount if it's an array
-    groupedPlayers.forEach(group => {
+    // console.log('Grouped by score');
+    // console.log(ScoreGroupedPlayers);
+
+    // Sort each group withing the task grouped players array by taskcount
+    ScoreGroupedPlayers.forEach(group => {
       if (Array.isArray(group)) {
         group.sort((a, b) => b.task_count - a.task_count); // Sort descending by taskcount
       }
     });
+    
+    // console.log('Sorted by taskcount');
+    // console.log(ScoreGroupedPlayers);
 
-    const finalGroupedPlayers = groupedPlayers.map(group => {
-      if (!Array.isArray(group)) return group; // Return single players as is
+    const TaskGroupedPlayers = [];
 
-      const groupedByTaskCount = [];
-      let currentTaskGroup = [];
-      let previousTaskCount = null;
+    ScoreGroupedPlayers.forEach(scoreGroup => {
+      if (!Array.isArray(scoreGroup)){ // If it is not a group but a single player
+        TaskGroupedPlayers.push(scoreGroup) 
+      } else {
 
-      group.forEach(player => {
-        if (player.task_count === previousTaskCount) {
-          currentTaskGroup.push(player);
-        } else {
-          if (currentTaskGroup.length === 1) {
-            groupedByTaskCount.push(currentTaskGroup[0]);
-          } else if (currentTaskGroup.length > 1) {
-            groupedByTaskCount.push(currentTaskGroup);
+        // Reset helper variables
+        currentGroup = [];
+        prev = null;
+
+        scoreGroup.forEach(player => {
+          // If it should be part of the current grouping (By Task Count)
+          if (player.task_count === prev) {
+            currentGroup.push(player);
+          } else {
+            // Push old grouping
+            if (currentGroup.length === 1) {
+              TaskGroupedPlayers.push(currentGroup[0]); // If only one player in group, add as an object
+            } else if (currentGroup.length > 1) {
+              TaskGroupedPlayers.push(currentGroup); // If multiple players, add as an array
+            }
+            // Start a new grouping
+            currentGroup = [player];
+            prev = player.task_count;
           }
-          currentTaskGroup = [player];
-          previousTaskCount = player.task_count;
+        })
+      
+        // Push the last group based on taskCount
+        if (currentGroup.length === 1) {
+          TaskGroupedPlayers.push(currentGroup[0]); // If only one player in group, add as an object
+        } else if (currentGroup.length > 1) {
+          TaskGroupedPlayers.push(currentGroup); // If multiple players, add as an array
         }
-      });
-
-      // Push the last group based on taskCount
-      if (currentTaskGroup.length === 1) {
-        groupedByTaskCount.push(currentTaskGroup[0]);
-      } else if (currentTaskGroup.length > 1) {
-        groupedByTaskCount.push(currentTaskGroup);
       }
+    })
 
-      return groupedByTaskCount.length === 1 ? groupedByTaskCount[0] : groupedByTaskCount;
-    });
+    // console.log('Grouped by task');
+    // console.log(TaskGroupedPlayers);
 
     // Sort each group by completion time if it's an array
-    finalGroupedPlayers.forEach(group => {
+    TaskGroupedPlayers.forEach(group => {
       if (Array.isArray(group)) {
-        group.sort((a, b) => Date(b.end_time) - Date(a.end_time)); // Sort descending by completion time
+        group.sort((a, b) => a.total_time_seconds - b.total_time_seconds); // Sort descending by completion time
       }
     });
 
-    const flattenedPlayers = finalGroupedPlayers.flatMap(group => {
+    // console.log('Sorted by time');
+    // console.log(TaskGroupedPlayers);
+
+    const flattenedPlayers = TaskGroupedPlayers.flatMap(group => {
       if (Array.isArray(group)) {
         return group; // If the group is an array of players, include each player individually
       } else {
@@ -110,11 +132,12 @@ router.get('/AllForSessionSorted', async (req, res) => {
       }
     });
 
-    res.json(flattenedPlayers);
+    // console.log(flattenedPlayers);
+    return JSON.stringify(flattenedPlayers);
   } catch (error) {
     console.error('Error executing query', error.stack);
-    res.status(500).send('Error fetching players');
+    throw error;
   }
-});
+};
 
 export default router;

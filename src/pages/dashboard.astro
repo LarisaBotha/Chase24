@@ -61,7 +61,7 @@ import TeamCard from '../components/TeamCard.astro';
 
             async startTimer() {
                 try {
-                    const response = await fetch(`https://${this.apiUrl}/api/legs/start`, {
+                    const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/legs/start`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ import TeamCard from '../components/TeamCard.astro';
                 this.sessionKey = urlParams.get('session_key'); // Retrieves the session_key from the URL
                 
                 try {
-                    const response = await fetch(`https://${this.apiUrl}/api/teams/AllForSession?session_key=${this.sessionKey}`, {
+                    const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/AllForSession?session_key=${this.sessionKey}`, {
                         method: 'GET'
                     });
                     

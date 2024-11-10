@@ -1,32 +1,6 @@
 import express from 'express';
 import pool from '../db.js';
-import { WebSocket } from 'ws';
-
-let wss; // Declare WebSocket Server instance variable
-
-// Function to set the WebSocket Server instance
-export const setWss = (webSocketServer) => {
-  wss = webSocketServer;
-};
-
-// Define routes for user-related operations
-// (Keep your existing route handlers here...)
-
-const notifyScoreChange = () => {
-  if (!wss || !wss.clients) {
-    console.error('WebSocket server not initialized');
-    return;
-  }
-
-  const message = "hello"; //JSON.stringify({ type: 'scoreUpdate', players: updatedPlayers });
-  
-  // Iterate over all connected clients and send the message
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
-  });
-};
+import { sendUpdateToSessionClients } from '../server.js'
 
 const router = express.Router();
 
@@ -110,25 +84,43 @@ router.post('/Stop', async (req, res) => {
   const { team_id } = req.body;
 
   try {
-    // Update the end_time and place of the specified team
+    // Update the end_time and score of the specified team
     const result = await pool.query(
-        `UPDATE teams AS t1
-        SET end_time = NOW(),
-            score = (
-                SELECT COALESCE(MAX(t2.score), 0) + 1
-                FROM teams AS t2
-                WHERE t2.leg_id = t1.leg_id
-            )
-        WHERE t1.id = $1
-        RETURNING *;`,
-        [team_id]
+      `UPDATE teams AS t1
+       SET end_time = NOW(),
+           score = (
+               SELECT COALESCE(MAX(t2.score), 0) + 1
+               FROM teams AS t2
+               WHERE t2.leg_id = t1.leg_id
+           )
+       WHERE t1.id = $1
+       RETURNING *;`,
+      [team_id]
     );
 
     if (result.rowCount === 0) {
-        return res.status(404).json({ message: 'Team not found' });
+      return res.status(404).json({ message: 'Team not found' });
     }
 
-    notifyScoreChange();
+    // Retrieve the session_key associated with the team_id
+    const sessionQuery = await pool.query(
+      `SELECT players.session_key 
+       FROM players 
+       JOIN player_teams ON players.id = player_teams.player_id
+       JOIN teams ON player_teams.team_id = teams.id
+       WHERE teams.id = $1
+       LIMIT 1`,
+      [team_id]
+    );
+
+    if (sessionQuery.rows.length === 0) {
+      return res.status(404).send('Session not found for the specified team');
+    }
+
+    const session_key = sessionQuery.rows[0].session_key;
+
+    sendUpdateToSessionClients(session_key); // Send update with session context
+
     res.json({ message: 'Team Stopped', team: result.rows[0] });
 
   } catch (error) {
@@ -154,7 +146,25 @@ router.post('/Advance', async (req, res) => {
       return res.status(404).send('Team not found');
     }
 
-    notifyScoreChange();
+    // Retrieve the session_key associated with the team_id
+    const sessionQuery = await pool.query(
+      `SELECT players.session_key 
+       FROM players 
+       JOIN player_teams ON players.id = player_teams.player_id
+       JOIN teams ON player_teams.team_id = teams.id
+       WHERE teams.id = $1
+       LIMIT 1`,
+      [team_id]
+    );
+
+    if (sessionQuery.rows.length === 0) {
+      return res.status(404).send('Session not found for the specified team');
+    }
+
+    const session_key = sessionQuery.rows[0].session_key;
+
+    sendUpdateToSessionClients(session_key); // Pass the session key and sorted players
+
     res.json({ message: 'Team Advanced', team: result.rows[0] });
   } catch (error) {
     console.error('Error executing query', error.stack);

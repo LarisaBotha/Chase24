@@ -24,7 +24,10 @@ import Layout from '../layouts/Layout.astro';
 					OR
 				</span>
 				<div class="bg-[#9e3e85] rounded-lg px-4 py-2">
-					<button class="text-white text-xl font-semibold font-['Braah One']">
+					<button 
+						class="text-white text-xl font-semibold font-['Braah One']"
+						@click="open = true; page = '/dashboard';"
+					>
 						JOIN
 					</button>
 				</div>
@@ -39,7 +42,7 @@ import Layout from '../layouts/Layout.astro';
 			<div class="bg-[#9e3e85] rounded-lg px-4 py-2">
 				<button 
 					class="text-white text-xl font-semibold font-['Braah One'] drop-shadow-lg" 
-					@click="open = true"
+					@click="open = true; page = '/leaderboad';"
 				>
 					JOIN SESSION
 				</button>

@@ -24,7 +24,7 @@ function generateTeams(leg_count, players, rivals, driver_groups) {
 
     for (let j = 0; j < leg_count; j ++){
         let teams = [];
-        let remaining_players = Array.from({ length: players.length }, (_, i) => i); //create an array that represents each players index
+        let remaining_players = Array.from({ length: players.length }, (_, i) => i); //create an array that represents each player's index
 
         for (let i = 0; i < driver_groups.length; i++) { // randomly assign a driver to each team
             let number_of_drivers = driver_groups[i].length;
@@ -32,14 +32,18 @@ function generateTeams(leg_count, players, rivals, driver_groups) {
             let random_driver_group_index = Random(0, number_of_drivers - 1); 
             // Get the index of the player from the driver group
             let random_driver_player_index = driver_groups[i][random_driver_group_index]; 
-            // Get the player object
-            let random_driver_index = random_driver_player_index;
-            
+
+
+            // Get the index of the player index within the remaining players array
+            // let random_driver_index = remaining_players.indexOf(random_driver_player_index);
 
             // Create team
             teams[i] = [];
             // Add driver to team
-            teams[i].push(random_driver_index);
+            teams[i].push(random_driver_player_index);
+
+            // console.log("player");
+            // console.log(players[random_driver_player_index])
 
             // Remove driver from remaining_players array
             remaining_players.splice(random_driver_player_index - i, 1);     
@@ -67,15 +71,10 @@ function generateTeams(leg_count, players, rivals, driver_groups) {
                     // Check rivals
                     for (let k = 0; k < rivals.length; k++) {
                         let pair = rivals[k]; // pair of players represented by index of players array
-                        let index = pair.indexOf(remaining_players[current_player_index].toString()) // TODO: THIS WONT WORK
-                        if(index != -1) { // The pair of rivals contains the current player
-                            let rival_index = wrapValue(index + 1, 0, 1)
-                            let player_index = parseInt(pair[rival_index]);
-                            if(team.includes(player_index)) { // if the team already contains this rival
-                                hasRival = true
-                                break; // no need to check the rest of this player's rivals
-                            }
-                        }
+                        if((players[pair[0]] == players[remaining_players[current_player_index]] && team.includes(pair[1])) 
+                            || (players[pair[1]] == players[remaining_players[current_player_index]] && team.includes(pair[0]))){
+                            hasRival = true
+                        } 
                     }
 
                     if (!hasRival)

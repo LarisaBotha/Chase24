@@ -36,7 +36,7 @@
             console.log(this.Progress);
             console.log(this.LastLeg);
             try {
-                const response = await fetch(`https://${this.apiUrl}/api/teams/advance`, {
+                const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/advance`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -56,7 +56,7 @@
         },
         async stopTeam() {
             try {
-                const response = await fetch(`https://${this.apiUrl}/api/teams/stop`, {
+                const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/stop`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
