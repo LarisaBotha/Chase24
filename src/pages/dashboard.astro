@@ -5,7 +5,6 @@ import TeamCard from '../components/TeamCard.astro';
 
 <Layout title="Chase 24 - Dashboard">
     <div 
-        class="w-2/3 flex items-center justify-center"
         x-data="{
             sessionKey: '',
             teams: [],
@@ -136,60 +135,61 @@ import TeamCard from '../components/TeamCard.astro';
         }"
         x-init="fetchTeams"
         x-effect="this.timer = Math.floor((Date.now() - this.timestamp) / 1000)"
+        class="w-full flex flex-col min-h-screen items-center p-4 xs:p-4 sm:p-5 md:p-5 lg:p-6 xs:p-6"
     >
-        <div class="w-full max-w-md flex flex-col justify-center items-center">
-            <!-- Timer Container to keep the rest of the components from re-rendering -->
-            <div class="w-full" >
-                <!-- Start Button -->
-                <button
-                    x-show="!timerStarted"
-                    @click="startTimer"
-                    class="w-full bg-green-500 text-white py-3 text-lg font-bold rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none"
-                >
-                    Start
-                </button>
 
-                <!-- Timer Display -->
-                <div 
-                    x-show="timerStarted" 
-                    class="w-full bg-[#D562AD] rounded-full justify-center items-center 
-                           p-2 xs:p-2 sm:p-3 md:p-3 lg:p-3 xl:p-3"
-                >
-                    <div class="font-semibold text-white text-center 
-                                text-4xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-6xl">
-                        <span x-text="formatTime()"></span>
-                    </div>
+        <!-- Timer Container to keep the rest of the components from re-rendering -->
+        <div class="w-full" >
+            <!-- Start Button -->
+            <button
+                x-show="!timerStarted"
+                @click="startTimer"
+                class="w-full bg-green-500 text-white py-3 text-lg font-bold rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none"
+            >
+                Start
+            </button>
+
+            <!-- Timer Display -->
+            <div 
+                x-show="timerStarted" 
+                class="w-full bg-[#D562AD] rounded-full justify-center items-center 
+                        p-2 xs:p-2 sm:p-3 md:p-3 lg:p-3 xl:p-3"
+            >
+                <div class="font-semibold text-white text-center 
+                            text-4xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-6xl">
+                    <span x-text="formatTime()"></span>
                 </div>
             </div>
-
-            <!-- Leg Name -->
-            <div 
-                class="text-center font-bold text-gray-800 
-                       mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6
-                       text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl" 
-                x-text="legsStatic && legsStatic[leg_number] ? legsStatic[leg_number].name : ''" 
-            />
-
-            <!-- Team Cards List -->
-            <div 
-                class="flex flex-col 
-                       gap-3 xs:gap-3 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-5
-                       mt-2 xs:mt-2 sm:mt-3 md:mt-3 lg:mt-4 xl:mt-4" 
-                x-show="player_teams[leg_number] && player_teams[leg_number].length > 0">
-                <template x-for="(team, team_index) in player_teams[leg_number]" :key="leg_number*player_teams[leg_number].length+team_index">
-                    <TeamCard />
-                </template>
-            </div>
-
-            <!-- Next leg Button -->
-            <button
-            x-show="allTeamsStopped"
-            @click="nextLeg"
-            class="w-full bg-green-500 text-white py-3 text-lg font-bold rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none 
-                   mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6"
-            >
-                Next Leg
-            </button>
         </div>
+
+        <!-- Leg Name -->
+        <div 
+            class="text-center font-bold text-gray-800 
+                    mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6
+                    text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl" 
+            x-text="legsStatic && legsStatic[leg_number] ? legsStatic[leg_number].name : ''" 
+        />
+
+        <!-- Team Cards List -->
+        <div 
+            class="w-full flex flex-col
+                    gap-3 xs:gap-3 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-5
+                    mt-2 xs:mt-2 sm:mt-3 md:mt-3 lg:mt-4 xl:mt-4" 
+            x-show="player_teams[leg_number] && player_teams[leg_number].length > 0">
+            <template x-for="(team, team_index) in player_teams[leg_number]" :key="leg_number*player_teams[leg_number].length+team_index">
+                <TeamCard />
+            </template>
+        </div>
+
+        <!-- Next leg Button -->
+        <button
+        x-show="allTeamsStopped"
+        @click="nextLeg"
+        class="w-full bg-[#FF84CD] text-pink-50 py-3 text-lg font-bold rounded-lg transition duration-300 hover:bg-green-600 focus:outline-none 
+                mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6"
+        >
+            Next Leg
+        </button>
+
     </div>
 </Layout>

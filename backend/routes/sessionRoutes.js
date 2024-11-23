@@ -86,7 +86,7 @@ router.post('/create', async (req, res) => {
           return [player1_id, player2_id];
         });
 
-        // console.log(rival_values);
+        console.log(rival_values);
 
         // Insert Rivalries
         const rivalInsertQuery = format(`
@@ -134,7 +134,7 @@ router.post('/create', async (req, res) => {
         const leg = legs[i];
         const team_values = leg.teamNames.map(teamName => [teamName, legMap[leg.legName]]);
 
-        console.log(team_values);
+        // console.log(team_values);
 
         // Insert Teams
         const teamInsertQuery = format(`
@@ -160,7 +160,7 @@ router.post('/create', async (req, res) => {
 
             const player_team_values = players_indexs.map(player_index => [playerMap[players[player_index].name], team_id]);
 
-            console.log(player_team_values);
+            // console.log(player_team_values);
 
             const playerTeamInsertQuery = format(`
                 INSERT INTO player_teams (player_id, team_id)

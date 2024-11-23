@@ -45,7 +45,7 @@ app.use('/api/session', sessionRoutes);
 //////////////
 // Teams
 /////////////
-import teamRoutes from './routes/teamRoutes.js';
+import teamRoutes, { fetchSortedActiveTeamsBySession } from './routes/teamRoutes.js';
 app.use('/api/teams', teamRoutes);
 
 //////////////
@@ -65,13 +65,14 @@ export const sendUpdateToSessionClients = async (session_key) => {
     return;
   }
 
-  const message = await fetchSortedPlayersBySession(session_key);
+  const players = await fetchSortedPlayersBySession(session_key);
+  const leg = await fetchSortedActiveTeamsBySession(session_key);
   
   const sessionClients = clientsBySession.get(session_key);
   if (sessionClients) {
     sessionClients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
+        client.send(JSON.stringify({players: players, leg: leg}));
       }
     });
   } else {

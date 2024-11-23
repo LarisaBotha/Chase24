@@ -1,0 +1,45 @@
+---
+import Player from '../components/Player.astro';
+import TopPlayer from '../components/TopPlayer.astro';
+---
+
+<div>
+    <!-- Leader Container -->
+    <div class="w-full h-full px-2.5 justify-center items-end inline-flex">
+
+        <!-- First ellipse (XL) -->
+        <div class="absolute rounded-full border-2 border-white opacity-40" 
+            style="width: 120%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -1;">
+            <div class="w-full h-full bg-white rounded-full opacity-40"/>
+        </div>
+
+        <!-- Second ellipse (L) -->
+        <div class="absolute rounded-full border-2 border-white opacity-40" 
+            style="width: 90%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -2;">
+            <div class="w-full h-full bg-white rounded-full opacity-40"/>
+        </div>
+
+        <!-- Third ellipse (M) -->
+        <div class="absolute rounded-full border-2 border-white opacity-40" 
+            style="width: 60%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -3;">
+            <div class="w-full h-full bg-white rounded-full opacity-40"/>
+        </div>
+
+        <!-- Fourth ellipse (S) -->
+        <div class="absolute rounded-full border-2 border-white opacity-40" 
+            style="width: 30%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -4;">
+            <div class="w-full h-full bg-white rounded-full opacity-40"/>
+        </div>
+
+        <template x-for="(player, index) in topPlayers" :key="index">
+            <TopPlayer />
+        </template>
+    </div>
+
+    <!-- Rank Container -->
+    <div class="w-full h-auto p-[15px] bg-[#e5dbc0] rounded-tl-[20px] rounded-tr-[20px] border border-[#e5dbc0] flex-col justify-start items-center gap-[15px] inline-flex">
+        <template x-for="(player, index) in otherPlayers" :key="index">
+        <Player/>
+        </template>
+    </div>
+</div>

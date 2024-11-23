@@ -14,7 +14,7 @@ const apiProtocol = import.meta.env.VITE_API_PROTOCOL;
   </head>
   <body 
     x-data=`{ apiProtocol: "${apiProtocol}", apiUrl: "${apiUrl}", page: '' }` 
-    class=`${background} min-h-screen overflow-auto flex items-center justify-center` 
+    class=`${background} overflow-auto flex items-start min-h-screen` 
   >
     <slot />
   </body>

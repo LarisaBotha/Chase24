@@ -1,0 +1,54 @@
+<div
+    class="w-full flex h-auto bg-[#c671a8] items-center inline-flex border border-2 border-[#a45f8e]
+            rounded-md sm:rounded-lg lg:rounded-xl
+            shadow-md sm:shadow-lg lg:shadow-xl shadow-[#90487b]/60
+            py-1 sm:py-2 md:py-3 lg:py-4 xl:py-5
+            px-2 sm:px-2 md:px-3 lg:px-3 xl:px-4
+            gap-2 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6"
+>
+    <!-- Rank -->
+    <div 
+        class="text-white font-bold font-['Joti One']
+               px-2 sm:px-2 md:px-3 lg:px-3 xl:px-4
+               text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl"
+        x-text="team_index + 1"
+    />
+
+    <!-- Main Container -->
+    <div class="w-full flex flex-col justify-start items-start gap-1.5">
+        <!-- Team Name -->
+        <div 
+            class="text-white font-bold 
+                    text-md sm:text-lg md:text-xl lg:text-2xl xl:text-3xl" 
+            x-text="team.team_name">
+        </div>
+        
+        <!-- Player -->
+        <div class="flex w-full justify-start items-start gap-2">
+            <template x-for="player in team.players" :key="player.player_id">
+                <div class="flex flex-col justify-start items-center gap-0.5 w-12">
+                    <img 
+                        :src="player.avatar" 
+                        alt="Avatar" 
+                        class="w-full rounded-full" 
+                        style="aspect-ratio: 1/1;" 
+                    />
+                    <div class="text-white font-bold text-xs sm:text-xs md:text-sm lg:text-md xl:text-lg" x-text="player.player_name"></div>
+                </div>
+            </template>
+        </div>
+    </div>
+    
+    <!-- Challenge Counter -->
+    <div class="self-stretch flex-col justify-center items-center inline-flex
+                py-1 sm:py-2 md:py-3 lg:py-4 xl:py-5
+                px-5 sm:px-6 md:px-7 lg:px-8 xl:px-9
+                gap-1 sm:gap-1.5 md:gap-2 lg:gap-2.5 xl:gap-3">
+        <template x-for="(n, index) in Array.from({ length: parseInt(leg.leg_task_count) })" :key="index">
+            <div 
+                :class="`h-1/${leg.leg_task_count} rounded-md ${parseInt(leg.leg_task_count) - index <= parseInt(team.team_task_count) ? 'bg-[#f9ec7a]' : 'bg-[#e5dbc0]'}`"
+                style="aspect-ratio: 1/1;">
+            </div>
+        </template>
+    </div>
+</div>

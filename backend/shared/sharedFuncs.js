@@ -31,8 +31,7 @@ function generateTeams(leg_count, players, rivals, driver_groups) {
             // Randomly generate index (of driver group) of driver in current driver group
             let random_driver_group_index = Random(0, number_of_drivers - 1); 
             // Get the index of the player from the driver group
-            let random_driver_player_index = driver_groups[i][random_driver_group_index]; 
-
+            let random_driver_player_index = driver_groups[i][random_driver_group_index];
 
             // Get the index of the player index within the remaining players array
             // let random_driver_index = remaining_players.indexOf(random_driver_player_index);
@@ -44,9 +43,10 @@ function generateTeams(leg_count, players, rivals, driver_groups) {
 
             // console.log("player");
             // console.log(players[random_driver_player_index])
+            // console.log(remaining_players)
 
             // Remove driver from remaining_players array
-            remaining_players.splice(random_driver_player_index - i, 1);     
+            remaining_players.splice(remaining_players.indexOf(parseInt(random_driver_player_index)), 1);     
 
             // console.log("remaining players after delete")
             // remaining_players.forEach(index => {

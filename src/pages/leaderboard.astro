@@ -1,91 +1,104 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Player from '../components/Player.astro';
-import TopPlayer from '../components/TopPlayer.astro';
+import TeamLeaderboard from '../components/team_leaderboard.astro'
+import PlayerLeaderboard from '../components/player_leaderboard.astro'
 ---
 
 <Layout title="Chase 24 - Leaderboard" background="bg-[#C671A8]">
-  <div 
-      x-data="{ 
-        sessionKey: '', 
-        players: [], 
-        topPlayers: [], 
-        otherPlayers: [], 
-        connectWebSocket() {
-          // Initialize WebSocket connection
-          const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-          this.websocket = new WebSocket(`${protocol}${this.apiUrl}?session_key=${this.sessionKey}`);
+  <div
+    x-data="{ 
+      group: false,
+      sessionKey: '', 
+      players: [], 
+      teams: [],
+      topPlayers: [], 
+      otherPlayers: [], 
+      connectWebSocket() {
+        // Initialize WebSocket connection
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        this.websocket = new WebSocket(`${protocol}${this.apiUrl}?session_key=${this.sessionKey}`);
 
-          // Handle incoming messages
-          this.websocket.onmessage = (event) => {
-            console.log(event)
-            console.log('here')
-            console.log(event.data)
-            const data = JSON.parse(event.data);
+        // Handle incoming messages
+        this.websocket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
 
-            this.players = data;
+          this.players = JSON.parse(data.players);
+          this.leg = JSON.parse(data.leg);
+          this.teams =  this.leg.teams;
+          // console.log(JSON.parse(data.leg).teams);
 
-            this.topPlayers = this.players.slice(0, 3); // Get top 3 players
-            this.otherPlayers = this.players.slice(3); // Get remaining players
-          };
+          this.topPlayers = this.players.slice(0, 3); // Get top 3 players
+          this.otherPlayers = this.players.slice(3); // Get remaining players
+        };
 
-          // Handle connection closure and attempt reconnection
-          this.websocket.onclose = () => {
-              console.log('WebSocket connection closed. Reconnecting...');
-              setTimeout(() => this.connectWebSocket(), 3000); // Reconnect after 3 seconds
-          };
+        // Handle connection closure and attempt reconnection
+        this.websocket.onclose = () => {
+            console.log('WebSocket connection closed. Reconnecting...');
+            setTimeout(() => this.connectWebSocket(), 3000); // Reconnect after 3 seconds
+        };
 
-          // Handle connection errors
-          this.websocket.onerror = (error) => {
-              console.error('WebSocket error:', error);
-          };
-        }
-      }" 
-      x-init="
-        sessionKey = new URLSearchParams(window.location.search).get('session_key');
-        console.log('Session Key:', sessionKey);
-        connectWebSocket();
-      "
+        // Handle connection errors
+        this.websocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+      }
+    }" 
+    x-init="
+      sessionKey = new URLSearchParams(window.location.search).get('session_key');
+      connectWebSocket();
+    "
+    class="h-full w-full"
   >
-    <!-- <h1 class="text-3xl font-bold mb-6">Leaderboard for Session: <span x-text="sessionKey"></span></h1> -->
 
-    <!-- Leader Container -->
-    <div class="w-full h-full px-2.5 justify-center items-end inline-flex">
-
-      <!-- First ellipse (XL) -->
-      <div class="absolute rounded-full border-2 border-white opacity-40" 
-            style="width: 120%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -1;">
-          <div class="w-full h-full bg-white rounded-full opacity-40"/>
-      </div>
-
-      <!-- Second ellipse (L) -->
-      <div class="absolute rounded-full border-2 border-white opacity-40" 
-            style="width: 90%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -2;">
-          <div class="w-full h-full bg-white rounded-full opacity-40"/>
-      </div>
-
-      <!-- Third ellipse (M) -->
-      <div class="absolute rounded-full border-2 border-white opacity-40" 
-            style="width: 60%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -3;">
-          <div class="w-full h-full bg-white rounded-full opacity-40"/>
-      </div>
-
-      <!-- Fourth ellipse (S) -->
-      <div class="absolute rounded-full border-2 border-white opacity-40" 
-            style="width: 30%; height: auto; aspect-ratio: 1/1; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: -4;">
-          <div class="w-full h-full bg-white rounded-full opacity-40"/>
-      </div>
-
-      <template x-for="(player, index) in topPlayers" :key="index">
-          <TopPlayer />
+    <button 
+      class="absolute top-2 right-2 z-10 bg-[#f9ec7a] rounded-lg p-2 shadow-md hover:bg-gray-200 focus:outline-none text-gray-700 hover:text-gray-800"
+      aria-label="User Profile"
+      x-on:click="group=!group"
+      >
+      <template x-if="!group">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          color="currentColor" 
+          class="shrink-0 h-6 w-6" 
+          role="img" 
+          aria-label="users group outline" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            stroke="currentColor" 
+            stroke-linecap="round" 
+            stroke-width="2" 
+            d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+          >
+          </path>
+        </svg>
       </template>
-    </div>
-
-    <!-- Rank Container -->
-    <div class="w-full h-auto p-[15px] bg-[#e5dbc0] rounded-tl-[20px] rounded-tr-[20px] border border-[#e5dbc0] flex-col justify-start items-center gap-[15px] inline-flex">
-      <template x-for="(player, index) in otherPlayers" :key="index">
-        <Player/>
+      <template x-if="group">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          color="currentColor" 
+          class="shrink-0 h-6 w-6" 
+          role="img" 
+          aria-label="user outline" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            stroke="currentColor" 
+            stroke-width="2" 
+            d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+          >
+          </path>
+        </svg>
       </template>
-    </div>
+    </button>
+
+    <template x-if="group">
+      <TeamLeaderboard />
+    </template>
+    <template x-if="!group">
+      <PlayerLeaderboard />
+    </template>
   </div>
 </Layout>

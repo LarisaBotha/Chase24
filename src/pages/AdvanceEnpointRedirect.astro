@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Redirect">
+    <div
+        x-data='{team_name: ""}'
+        x-init="
+            teamID = new URLSearchParams(window.location.search).get('team_id');
+            try{
+                const response = await fetch(`${apiProtocol}${apiUrl}/api/teams/Advance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ team_id: teamID })
+                });
+                if (response.ok) {
+                    responseData = await response.json()
+                    team_name = responseData.team.name;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        "
+    >
+        <h2>THANK YOU</h2>
+        <h3 x-text="team_name"></h3>
+    </div>
+</Layout>
