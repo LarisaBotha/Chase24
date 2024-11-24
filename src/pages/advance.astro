@@ -104,7 +104,7 @@ import TeamButton from '../components/TeamButton.astro';
             class="w-full flex flex-col
                     gap-3 xs:gap-3 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-5
                     mt-2 xs:mt-2 sm:mt-3 md:mt-3 lg:mt-4 xl:mt-4" 
-            x-show="teams.length > 0">
+            x-show="teams.length > 0 && leg.leg_start_time">
             <template x-for="(team, team_index) in teams" :key="team.team_id">
                 <div 
                     x-data="{

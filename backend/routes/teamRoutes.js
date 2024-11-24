@@ -13,26 +13,44 @@ export const fetchSortedActiveTeamsBySession = async (session_key) => {
         FROM teams t
         JOIN player_teams pt ON t.id = pt.team_id
         JOIN players p ON pt.player_id = p.id
-        JOIN legs l ON t.leg_id = l.id -- Assuming there's a "legs" table or similar with leg_name
+        JOIN legs l ON t.leg_id = l.id
         WHERE p.session_key = $1 AND t.end_time IS NULL
         GROUP BY t.leg_id, l.name, l.task_count, l.start_time
         ORDER BY t.leg_id ASC
         LIMIT 1
+      ),
+      fallback_leg AS (
+        SELECT t.leg_id, l.name AS leg_name, l.task_count AS leg_task_count, l.start_time as leg_start_time
+        FROM teams t
+        JOIN player_teams pt ON t.id = pt.team_id
+        JOIN players p ON pt.player_id = p.id
+        JOIN legs l ON t.leg_id = l.id
+        WHERE p.session_key = $1
+        GROUP BY t.leg_id, l.name, l.task_count, l.start_time
+        ORDER BY l.start_time DESC
+        LIMIT 1
+      ),
+      selected_leg AS (
+        SELECT * FROM active_leg
+        UNION ALL
+        SELECT * FROM fallback_leg
+        WHERE NOT EXISTS (SELECT 1 FROM active_leg)
       )
-      SELECT al.leg_id, al.leg_name, al.leg_task_count, al.leg_start_time,
-             t.id AS team_id, t.name AS team_name, t.task_count AS team_task_count, t.end_time AS team_end_time,
+      SELECT sl.leg_id, sl.leg_name, sl.leg_task_count, sl.leg_start_time,
+             t.id AS team_id, t.name AS team_name, t.task_count AS team_task_count, t.end_time AS team_end_time, 
+             t.score AS team_score, -- Include the score
              pt.player_id, p.name AS player_name, p.avatar
       FROM teams t
       JOIN player_teams pt ON t.id = pt.team_id
       JOIN players p ON pt.player_id = p.id
-      JOIN active_leg al ON t.leg_id = al.leg_id
+      JOIN selected_leg sl ON t.leg_id = sl.leg_id
       WHERE p.session_key = $1
-      ORDER BY t.id ASC, pt.player_id ASC;
+      ORDER BY t.score ASC, t.id ASC, pt.player_id ASC; -- Order by score
     `,
       [session_key]
     );
 
-    // If no active leg is found, return an empty response
+    // If no legs are found, return an empty response
     if (result.rows.length === 0) {
       return JSON.stringify([]);
     }
@@ -49,6 +67,7 @@ export const fetchSortedActiveTeamsBySession = async (session_key) => {
           team_name: row.team_name,
           team_task_count: row.team_task_count,
           team_end_time: row.team_end_time,
+          team_score: row.team_score, // Add score to the team object
           players: []
         };
         acc.push(team);
