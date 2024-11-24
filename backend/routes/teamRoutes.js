@@ -4,61 +4,22 @@ import { sendUpdateToSessionClients } from '../server.js'
 
 const router = express.Router();
 
-// export const fetchSortedActiveTeamsBySession = async (session_key) => {
-//   try {
-//     const result = await pool.query(
-//       `
-//       WITH active_leg AS (
-//         SELECT t.leg_id
-//         FROM teams t
-//         JOIN player_teams pt ON t.id = pt.team_id
-//         JOIN players p ON pt.player_id = p.id
-//         WHERE p.session_key = $1 AND t.end_time IS NULL
-//         GROUP BY t.leg_id
-//         ORDER BY t.leg_id ASC
-//         LIMIT 1
-//       )
-//       SELECT t.id AS team_id, t.name AS team_name, t.task_count AS team_task_count, t.end_time AS team_end_time,
-//             pt.player_id, p.name AS player_name, p.avatar
-//       FROM teams t
-//       JOIN player_teams pt ON t.id = pt.team_id
-//       JOIN players p ON pt.player_id = p.id
-//       JOIN active_leg al ON t.leg_id = al.leg_id
-//       WHERE p.session_key = $1
-//       ORDER BY t.id ASC, pt.player_id ASC;
-//     `, [session_key]);
-
-//     console.log(result)
-
-//     // If no active leg is found, return an empty response
-//     if (result.rows.length === 0) {
-//       return JSON.stringify([]);
-//     }
-
-//     // Return the teams and players for the active leg
-//     return JSON.stringify(result.rows);
-//   } catch (error) {
-//     console.error('Error executing query', error.stack);
-//     throw error;
-//   }
-// };
-
 export const fetchSortedActiveTeamsBySession = async (session_key) => {
   try {
     const result = await pool.query(
       `
       WITH active_leg AS (
-        SELECT t.leg_id, l.name AS leg_name, l.task_count AS leg_task_count
+        SELECT t.leg_id, l.name AS leg_name, l.task_count AS leg_task_count, l.start_time as leg_start_time
         FROM teams t
         JOIN player_teams pt ON t.id = pt.team_id
         JOIN players p ON pt.player_id = p.id
         JOIN legs l ON t.leg_id = l.id -- Assuming there's a "legs" table or similar with leg_name
         WHERE p.session_key = $1 AND t.end_time IS NULL
-        GROUP BY t.leg_id, l.name, l.task_count
+        GROUP BY t.leg_id, l.name, l.task_count, l.start_time
         ORDER BY t.leg_id ASC
         LIMIT 1
       )
-      SELECT al.leg_id, al.leg_name, al.leg_task_count,
+      SELECT al.leg_id, al.leg_name, al.leg_task_count, al.leg_start_time,
              t.id AS team_id, t.name AS team_name, t.task_count AS team_task_count, t.end_time AS team_end_time,
              pt.player_id, p.name AS player_name, p.avatar
       FROM teams t
@@ -77,7 +38,7 @@ export const fetchSortedActiveTeamsBySession = async (session_key) => {
     }
 
     // Extract the leg information
-    const { leg_id, leg_name, leg_task_count } = result.rows[0];
+    const { leg_id, leg_name, leg_task_count, leg_start_time } = result.rows[0];
 
     // Group data by team
     const teams = result.rows.reduce((acc, row) => {
@@ -105,6 +66,7 @@ export const fetchSortedActiveTeamsBySession = async (session_key) => {
       leg_id,
       leg_name,
       leg_task_count,
+      leg_start_time,
       teams
     });
   } catch (error) {
@@ -113,6 +75,22 @@ export const fetchSortedActiveTeamsBySession = async (session_key) => {
   }
 };
 
+router.get('/ActiveTeamsBySession', async (req, res) => {
+  try {
+    const { session_key } = req.query;
+
+    // Await the result of the async function
+    const data = await fetchSortedActiveTeamsBySession(session_key);
+
+    // Return the data in the response
+    res.json(JSON.parse(data));
+  } catch (error) {
+    console.error('Error fetching active teams by session:', error);
+
+    // Respond with an error message
+    res.status(500).json({ error: 'Failed to fetch active teams by session' });
+  }
+});
 
 // Define routes for user-related operations
 router.get('/AllForSession', async (req, res) => {
@@ -248,7 +226,11 @@ router.post('/Stop', async (req, res) => {
 
     sendUpdateToSessionClients(session_key); // Send update with session context
 
-    res.json({ message: 'Team Stopped', leg_id });
+    // Await the result of the async function
+    const data = await fetchSortedActiveTeamsBySession(session_key);
+
+    // Return the data in the response
+    res.json(JSON.parse(data));
   } catch (error) {
     console.error('Error executing query', error.stack);
     res.status(500).send('Error stopping team');
@@ -310,7 +292,12 @@ router.post('/Advance', async (req, res) => {
 
     sendUpdateToSessionClients(session_key); // Send updated ranks to clients
 
-    res.json({ message: 'Team Advanced', leg_id });
+    // Await the result of the async function
+    const data = await fetchSortedActiveTeamsBySession(session_key);
+
+    // Return the data in the response
+    res.json(JSON.parse(data));
+
   } catch (error) {
     console.error('Error executing query', error.stack);
     res.status(500).send('Error advancing team task count');

@@ -1,0 +1,145 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TeamButton from '../components/TeamButton.astro';
+---
+
+<Layout title="Chase 24 - Advance" background="bg-[#C671A8]">
+    <div
+        x-data="{
+            sessionKey: '',
+            teams: [],
+            leg: {},
+            async fetchTeams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                this.sessionKey = urlParams.get('session_key');
+                try {
+                    const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/ActiveTeamsBySession?session_key=${this.sessionKey}`);
+
+                    if (response.ok){
+                        this.leg = await response.json();
+                        this.teams = this.leg.teams ? this.leg.teams : [];
+                    } else {
+                        throw new Error(`Error: ${response.statusText}`);
+                    }
+
+                } catch (err) {
+                    this.error = err.message;
+                } finally {
+                    this.loading = false;
+                }
+            }
+        }"
+        x-init="fetchTeams()"
+        class="flex flex-col p-5 gap-5"
+    >
+        <!-- Background container -->
+        <div class="absolute inset-0 -z-10 bg-[#C671A8] overflow-hidden">
+            <!-- Bubble 1 -->
+            <div class="absolute opacity-50 rounded-full border-2 border-white w-72 h-72 top-[20%] left-[35%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 2 -->
+            <div class="absolute opacity-40 rounded-full border-2 border-white w-96 h-96 top-[55%] left-[25%] transform -translate-x-1/2">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 3 -->
+            <div class="absolute opacity-30 rounded-full border-2 border-white w-60 h-60 top-[-20%] left-[10%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 4 -->
+            <div class="absolute opacity-50 rounded-full border-2 border-white w-40 h-40 top-[-10%] left-[70%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 5 -->
+            <div class="absolute opacity-60 rounded-full border-2 border-white w-80 h-80 top-[5%] left-[-15%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 6 -->
+            <div class="absolute opacity-50 rounded-full border-2 border-white w-48 h-48 top-[50%] left-[55%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 7 -->
+            <div class="absolute opacity-40 rounded-full border-2 border-white w-36 h-36 top-[45%] left-[60%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 8 -->
+            <div class="absolute opacity-35 rounded-full border-2 border-white w-64 h-64 top-[-5%] left-[75%] transform -translate-x-1/2">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 9 -->
+            <div class="absolute opacity-45 rounded-full border-2 border-white w-52 h-52 top-[30%] left-[-25%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 10 -->
+            <div class="absolute opacity-60 rounded-full border-2 border-white w-96 h-96 top-[70%] left-[50%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 11 -->
+            <div class="absolute opacity-40 rounded-full border-2 border-white w-72 h-72 top-[45%] left-[5%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+            <!-- Bubble 12 -->
+            <div class="absolute opacity-50 rounded-full border-2 border-white w-48 h-48 top-[70%] left-[75%]">
+                <div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+            </div>
+        </div>
+    
+        <!-- Leg Name -->
+        <div class="flex w-full items-center justify-center mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6">
+            <!-- Glowing text using text-shadow -->
+            <span class="absolute mx-auto flex w-fit bg-transparent text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl box-content font-extrabold text-white text-center select-none"
+                style="text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);"
+                x-text="leg.leg_name" 
+            />
+      
+            <!-- The same text as an <h1>, glowing in white -->
+            <h1 class="relative top-0 w-fit h-autojustify-center flex bg-transparent items-center text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-extrabold text-white text-center select-auto text-shadow-md"
+                style="text-shadow: 0 0 10px rgba(249, 236, 122, 0.8), 0 0 20px rgba(249, 236, 122, 0.6), 0 0 30px rgba(249, 236, 122, 0.4);"
+                x-text="leg.leg_name" 
+            />
+        </div>
+
+        <!-- Team Cards List -->
+        <div 
+            class="w-full flex flex-col
+                    gap-3 xs:gap-3 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-5
+                    mt-2 xs:mt-2 sm:mt-3 md:mt-3 lg:mt-4 xl:mt-4" 
+            x-show="teams.length > 0">
+            <template x-for="(team, team_index) in teams" :key="team.team_id">
+                <div 
+                    x-data="{
+                        async onClick() {
+                            try {
+                                const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/Advance`, {
+                                    method: 'POST', // Use POST method
+                                    headers: {
+                                        'Content-Type': 'application/json' // Set the content type as JSON
+                                    },
+                                    body: JSON.stringify({
+                                        team_id: team.team_id // Send team_id in the request body
+                                    })
+                                });
+
+                                if (response.ok){
+                                    leg = await response.json();
+                                    teams = leg.teams ? leg.teams : [];
+                                } else {
+                                    throw new Error(`Error: ${response.statusText}`);
+                                }
+
+                                window.location.href = `/leaderboard?session_key=${this.sessionKey}`;
+
+                            } catch (err) {
+                                this.error = err.message;
+                            } finally {
+                                this.loading = false;
+                            }
+                        }
+                    }"
+                    x-show="team.team_task_count < leg.leg_task_count">
+                    <TeamButton />
+                </div>
+            </template>
+        </div>
+    </div>
+</Layout>
