@@ -23,6 +23,48 @@ export const fetchSortedPlayersBySession = async (session_key) => {
        ORDER BY total_score ASC;`,
       [session_key]
     );
+    // const result = await pool.query(
+    //   `WITH active_leg AS (
+    //       SELECT legs.id
+    //       FROM legs
+    //       JOIN teams ON teams.leg_id = legs.id
+    //       WHERE teams.task_count >= 1
+    //       GROUP BY legs.id
+    //       HAVING COUNT(*) FILTER (WHERE teams.end_time IS NULL) > 0
+    //       ORDER BY legs.id ASC
+    //       LIMIT 1
+    //   )
+    //   SELECT players.name, 
+    //          players.avatar,
+    //          SUM(CASE 
+    //                WHEN EXISTS (
+    //                     SELECT 1 
+    //                     FROM teams AS t 
+    //                     WHERE t.leg_id = legs.id 
+    //                       AND (t.end_time IS NOT NULL OR legs.id = (SELECT id FROM active_leg))
+    //                )
+    //                THEN COALESCE(teams.score, (SELECT COUNT(*) + 1 
+    //                                            FROM teams 
+    //                                            WHERE teams.leg_id = teams.leg_id))
+    //                ELSE 0
+    //              END) AS total_score,
+    //          SUM(teams.task_count) AS task_count,
+    //          SUM(
+    //              CASE 
+    //                WHEN teams.end_time IS NOT NULL OR legs.id = (SELECT id FROM active_leg)
+    //                THEN EXTRACT(EPOCH FROM (teams.end_time - legs.start_time))
+    //                ELSE 0
+    //              END
+    //          ) AS total_time_seconds
+    //   FROM players
+    //   JOIN player_teams ON players.id = player_teams.player_id
+    //   JOIN teams ON player_teams.team_id = teams.id
+    //   JOIN legs ON teams.leg_id = legs.id
+    //   WHERE players.session_key = $1
+    //   GROUP BY players.name, players.avatar
+    //   ORDER BY total_score ASC;`,
+    //   [session_key]
+    // );
 
     const players = result.rows;
 

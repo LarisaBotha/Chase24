@@ -7,46 +7,70 @@ import Layout from '../layouts/Layout.astro';
 
 	<div 
 		x-data="{ open: false }" 
-		class="w-full h-full flex flex-col justify-center items-center gap-8 p-8"
+		class="w-full h-screen flex flex-col justify-center items-center gap-8 p-8"
 	>
-		<!-- Coordinator Card -->
-		<div class="bg-[#ff84cd] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
-			<span class="text-white text-2xl font-semibold font-['Braah One']">
-				COORDINATOR
-			</span>
-			<div class="flex items-center gap-4">
-				<form action="/register_players" method="get" class="bg-[#9e3e85] rounded-lg px-4 py-2">
-					<button class="text-white text-xl font-semibold font-['Braah One']">
-						CREATE
-					</button>
-				</form>
-				<span class="text-[#451c3a] text-xl font-semibold font-['Braah One']">
-					OR
-				</span>
-				<div class="bg-[#9e3e85] rounded-lg px-4 py-2">
-					<button 
-						class="text-white text-xl font-semibold font-['Braah One']"
-						@click="open = true; page = '/dashboard';"
-					>
-						JOIN
-					</button>
-				</div>
+		<div class="absolute inset-0 -z-10 overflow-hidden">
+			<!-- Bubble 1 -->
+			<div class="absolute opacity-50 rounded-full border-2 border-white w-72 h-72 top-[-12%] left-[65%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 2 -->
+			<div class="absolute opacity-50 rounded-full border-2 border-white w-64 h-64 top-[15%] left-[70%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 3 -->
+			<div class="absolute opacity-60 rounded-full border-2 border-white w-80 h-80 top-[40%] left-[-15%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 4 -->
+			<div class="absolute opacity-35 rounded-full border-2 border-white w-72 h-72 top-[-5%] left-[45%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 5 -->
+			<div class="absolute opacity-50 rounded-full border-2 border-white w-48 h-48 top-[60%] left-[85%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 6 -->
+			<div class="absolute opacity-30 rounded-full border-2 border-white w-64 h-64 top-[90%] left-[30%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 7 -->
+			<div class="absolute opacity-45 rounded-full border-2 border-white w-72 h-72 top-[20%] left-[-10%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 8 -->
+			<div class="absolute opacity-50 rounded-full border-2 border-white w-96 h-96 top-[95%] left-[75%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 9 -->
+			<div class="absolute opacity-40 rounded-full border-2 border-white w-52 h-52 top-[40%] left-[55%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 10 -->
+			<div class="absolute opacity-60 rounded-full border-2 border-white w-40 h-40 top-[5%] left-[20%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
+			</div>
+			<!-- Bubble 11 -->
+			<div class="absolute opacity-35 rounded-full border-2 border-white w-80 h-80 top-[85%] left-[-15%]">
+				<div class="h-full w-full bg-white opacity-50 rounded-full border-2"></div>
 			</div>
 		</div>
 
-		<!-- Player Card -->
-		<div class="bg-[#ff84cd] rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
-			<span class="text-white text-2xl font-semibold font-['Braah One']">
-				PLAYER
-			</span>
-			<div class="bg-[#9e3e85] rounded-lg px-4 py-2">
-				<button 
-					class="text-white text-xl font-semibold font-['Braah One'] drop-shadow-lg" 
-					@click="open = true; page = '/leaderboad';"
-				>
-					JOIN SESSION
-				</button>
-			</div>
+		<!-- Coordinator -->
+		<form action="/register_players" method="get" class="bg-[#f9ec7a] rounded-lg px-6 py-3 shadow-lg">
+			<button class="text-gray-600 text-2xl font-semibold font-['Braah One']">
+				CREATE SESSION
+			</button>
+		</form>
+
+		<!-- Players -->
+		<div class="bg-[#f9ec7a] rounded-lg px-6 py-3 shadow-lg">
+			<button 
+				class="text-gray-600 text-2xl font-semibold font-['Braah One']" 
+				@click="open = true; page = '/leaderboad';"
+			>
+				JOIN SESSION
+			</button>
 		</div>
 
 		<!-- Modal -->
