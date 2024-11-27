@@ -4,6 +4,26 @@
 
 <div 
     x-ref="parent"
+    x-data="{
+        get TimeString() {
+            // const startDate = new Date(Date.parse(this.leg.leg_start_time));
+            // const endDate = new Date(Date.parse(this.team.team_end_time));
+            
+            // let diffMs = endDate - startDate;
+            
+            // if (diffMs < 0) {
+            //     throw new Error('End time must be after start time');
+            // }
+
+            // const totalSeconds = Math.floor(diffMs / 1000);
+            // const hours = Math.floor(totalSeconds / 3600);
+            // const minutes = Math.floor((totalSeconds % 3600) / 60);
+            // const seconds = totalSeconds % 60;
+
+            // return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            return '15:35:90'
+        }
+    }"
     :class="{ 'order-2': index === 0,'order-1': index === 1, 'order-3': index === 2}"
     class="w-1/4 h-auto flex-col justify-start items-center inline-flex"
 >
@@ -47,6 +67,14 @@
                        text-sm sm:text-reg md:text-lg lg:text-xl xl:text-2xl"
                 x-text="player.total_score + ' pts'"
             />
+        </div>
+        <!-- Time Bubble -->
+        <div class="h-auto">
+            <!-- <span 
+                x-show="team.team_end_time" 
+                class="bg-[#f9ec7a] text-black text-xs font-medium font-[Inter] px-2 py-1 rounded-lg shadow-lg" 
+                x-text="TimeString">
+            </span> -->
         </div>
     </div>
     <!-- Podium Container -->

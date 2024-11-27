@@ -69,7 +69,7 @@
     x-init = "initialise"
 >
     <!-- Leg Registration Card -->
-    <div class="w-full max-w-md bg-white p-4 rounded-lg drop-shadow-lg">
+    <div class="w-full m-6 bg-white p-4 rounded-lg drop-shadow-lg">
         <h3 class="text-gray-700 text-xl font-bold mb-4">Register Leg and Teams</h3>
         
         <!-- Section for Leg Name -->
@@ -118,7 +118,7 @@
 
         <!-- Display Registered Legs and Teams on the Card -->
         <template x-if="legs.length > 0">
-            <div class="w-full max-w-md mt-4">
+            <div class="w-full m-6 mt-4">
                 <h3 class="text-gray-700 text-lg font-bold mb-2">Registered Legs and Teams</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <template x-for="(leg, index) in legs" :key="index">

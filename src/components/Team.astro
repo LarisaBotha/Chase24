@@ -1,9 +1,7 @@
 <div
     x-data="{
         get TimeString() {
-            console.log(this.leg.leg_start_time)
             const startDate = new Date(Date.parse(this.leg.leg_start_time));
-            console.log(this.team.team_end_time)
             const endDate = new Date(Date.parse(this.team.team_end_time));
             
             let diffMs = endDate - startDate;
