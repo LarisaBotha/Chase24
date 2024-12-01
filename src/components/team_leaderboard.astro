@@ -2,7 +2,12 @@
 import Team from '../components/Team.astro';
 ---
 
-<div class="w-full h-full flex flex-col"> <!--class="absolute inset-0 z-2 w-full h-screen bg-[#e5dbc0]"-->
+<div 
+  x-data="{
+    confirm: false
+  }"
+  class="w-full h-full flex flex-col"
+> <!--class="absolute inset-0 z-2 w-full h-screen bg-[#e5dbc0]"-->
   <!-- Background container -->
   <div class="absolute inset-0 -z-10 overflow-hidden">
     <!-- Bubble 1 -->
@@ -69,12 +74,6 @@ import Team from '../components/Team.astro';
           x-text="leg.leg_name" 
       />
     </div>
-   <!-- <div 
-        class="text-center font-bold text-gray-800 
-            mt-4 xs:mt-4 sm:mt-5 md:mt-5 lg:mt-6 xl:mt-6
-            text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl" 
-        x-text="leg.leg_name" 
-    /> -->
 
     <div class="p-4">
         <!-- Team Cards List -->
@@ -86,6 +85,55 @@ import Team from '../components/Team.astro';
             <template x-for="(team, team_index) in teams" :key="team.team_id">
                 <Team />
             </template>
+        </div>
+    </div>
+
+    <!-- Start leg button -->
+    <div x-show="!leg.leg_start_time" class="p-3">
+      <button 
+          x-data="{
+              async startTimer() {
+                try {
+                    const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/legs/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({leg_id: this.legsStatic[this.leg_number].id}) 
+                });
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+              }
+          }"
+          @click="confirm = true"
+          class="w-full bg-[#f9ec7a] text-gray-600 p-2 rounded-lg hover:bg-gray-600 font-['Braah One'] font-bold">
+          Start Leg
+      </button>
+    </div>
+
+    <!-- Confirmation Popup -->
+    <div 
+        x-show="confirm" 
+        @click.away="confirm = false" 
+        class="absolute bg-gray-600 bg-opacity-90 text-white rounded-lg p-4 shadow-lg flex flex-col gap-3 items-center justify-center"
+        style="top: 50%; left: 50%; transform: translate(-50%, -50%);"
+    >
+        <p class="text-lg font-bold">Are you sure you want to start the timer for leg "<span x-text="leg.leg_name" ></span>"?</p>
+        <div class="flex gap-4">               
+            <button 
+                @click="confirm = false" 
+                class="bg-red-500 text-white px-5 py-2 rounded-lg font-['Braah One'] font-bold"
+            >
+                No
+            </button>
+            <button
+                @click="startTimer"
+                class="bg-[#f9ec7a] text-gray-600 px-5 py-2 rounded-lg font-['Braah One'] font-bold"
+            >
+                Yes
+            </button>
         </div>
     </div>
 </div>
