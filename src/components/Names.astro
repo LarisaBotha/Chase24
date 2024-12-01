@@ -95,11 +95,10 @@
         </div> 
 
         <!-- Button to add more team input fields -->
-        <button 
-            @click="addTeamInput"
-            class="flex items-center justify-center w-10 h-10 mb-4 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-        >
-            <span class="text-xl font-bold">+</span>
+        <button type="button" @click="addTeamInput" class="mb-4 bg-[#f9ec7a] font-medium rounded-full text-sm p-1.5 text-center inline-flex items-center me-2">
+            <svg class="w-4 h-4 text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
+            </svg>              
         </button>
 
          <!-- Challenges in leg -->
@@ -110,9 +109,10 @@
             placeholder="Enter a number"/>
         
         <!-- Register Leg Button -->
-        <button 
+        <button
             @click="registerLeg"
-            class="w-full bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 font-bold mb-2">
+            class="w-full bg-[#b7519d] text-white p-3 rounded-lg font-bold hover:bg-[#9E3E85] mb-2"
+        >
             Register Leg
         </button>
 
@@ -144,7 +144,7 @@
         <!-- Done Button -->
         <button 
             @click="createSession"
-            class="w-full bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 font-bold">
+            class="w-full bg-[#f9ec7a] text-gray-600 p-2 rounded-lg hover:bg-gray-600 font-['Braah One'] font-bold">
             Create Session
         </button>
     </div>

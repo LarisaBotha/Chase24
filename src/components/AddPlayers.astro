@@ -52,21 +52,21 @@
     <!-- Avatar Selection -->
     <div class="mb-4">
       <p class="block text-gray-700 text-sm font-bold mb-2">Choose an Avatar</p>
-      <div class="flex flex-wrap space-x-1">
+      <div class="grid grid-cols-5 gap-2">
         <template x-for="(avatar, index) in avatars" :key="index">
-            <div class="flex-shrink-0 w-1/6">
-                <img
-                    :src="avatar"
-                    alt="Avatar"
-                    class="w-10 rounded-full border-2 cursor-pointer"
-                    style="height: auto; aspect-ratio: 1/1;"
-                    :class="selectedAvatar === avatar ? 'border-[#b7519d]' : 'border-transparent'"
-                    @click="selectedAvatar = avatar"
-                />
-            </div>
+          <div>
+            <img
+              :src="avatar"
+              alt="Avatar"
+              class="w-full h-auto rounded-full border-2 cursor-pointer"
+              :class="selectedAvatar === avatar ? 'border-[#b7519d]' : 'border-transparent'"
+              @click="selectedAvatar = avatar"
+            />
+          </div>
         </template>
       </div>
     </div>
+
   
     <!-- Register Player Button -->
     <div class="mb-4">
@@ -97,7 +97,7 @@
     <div class="flex justify-end">
       <button
         @click="goToNextCard()"
-        class="bg-green-500 text-white p-3 rounded-lg font-bold hover:bg-green-600"
+        class="bg-[#f9ec7a] text-gray-600 px-5 py-2 rounded-lg font-['Braah One'] font-bold hover:bg-green-600"
       >
         Next
       </button>

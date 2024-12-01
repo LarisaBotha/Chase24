@@ -10,54 +10,57 @@
  }" 
  class="w-full m-6 bg-white shadow-md rounded-xl p-6"
 >
-<!-- Rivals Registration Card -->
-<div class="mb-4">
-    <h3 class="text-gray-700 text-lg font-bold mb-2">Register Rivals</h3>
-    <div class="flex flex-col sm:flex-row gap-2 mb-4 ">
-        <select x-model="rivalPlayers[0]" class="flex-1 p-3 rounded border border-gray-300">
-            <option value="-1" disabled selected>Select Player</option>
-            <template x-for="(player, index) in registeredPlayers" :key="index">
-                <option :value="index" x-text="player.name"></option>
-            </template>
-        </select>
-        <h2 class="flex justify-center items-center font-bold">VS</h2>
-        <select x-model="rivalPlayers[1]" class="flex-1 p-3 rounded border border-gray-300">
-            <option value="-1" disabled selected>Select Player</option>
-            <template x-for="(player, index) in registeredPlayers" :key="index">
-                <option :value="index" x-text="player.name"></option>
-            </template>
-        </select>
-    </div>
-    
-    <button 
-        @click="registerRivals"
-        class="w-full bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600">
-        Register Rivals
-    </button>
-</div>
-
-<!-- Display Registered Rivals -->
-<template x-if="rivals.length > 0">
+    <!-- Rivals Registration Card -->
     <div class="mb-4">
-        <h3 class="text-gray-700 text-lg font-bold mb-2">Registered Rivals</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <template x-for="(rival, index) in rivals" :key="index">
-                <div class="p-3 bg-gray-200 rounded-lg">
-                    <p class="text-gray-700 font-bold">Rival Group: <span x-text="index + 1"></span></p>
-                    <p x-text="'Rivals: ' + registeredPlayers[rival[0]].name + ' vs ' + registeredPlayers[rival[1]].name"></p>
-                </div>
-            </template>
+        <h3 class="text-gray-700 text-lg font-bold mb-2">Register Rivals</h3>
+        <div class="flex flex-col sm:flex-row gap-2 mb-4 ">
+            <select x-model="rivalPlayers[0]" class="flex-1 p-3 rounded border border-gray-300">
+                <option value="-1" disabled selected>Select Player</option>
+                <template x-for="(player, index) in registeredPlayers" :key="index">
+                    <option :value="index" x-text="player.name"></option>
+                </template>
+            </select>
+            <h2 class="flex justify-center items-center font-bold">VS</h2>
+            <select x-model="rivalPlayers[1]" class="flex-1 p-3 rounded border border-gray-300">
+                <option value="-1" disabled selected>Select Player</option>
+                <template x-for="(player, index) in registeredPlayers" :key="index">
+                    <option :value="index" x-text="player.name"></option>
+                </template>
+            </select>
         </div>
+        
+        <div class="mb-4">
+            <button
+              @click="registerRivals()"
+              class="w-full bg-[#b7519d] text-white p-3 rounded-lg font-bold hover:bg-[#9E3E85]"
+            >
+              Register Rivals
+            </button>
+          </div>
     </div>
-</template>
 
-<!-- Next Button -->
-<div class="flex justify-end">
-  <button
-    @click="goToNextCard"
-    class="bg-blue-500 text-white p-3 rounded-lg font-bold hover:bg-blue-600"
-  >
-    Next
-  </button>
-</div>
+    <!-- Display Registered Rivals -->
+    <template x-if="rivals.length > 0">
+        <div class="mb-4">
+            <h3 class="text-gray-700 text-lg font-bold mb-2">Registered Rivals</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <template x-for="(rival, index) in rivals" :key="index">
+                    <div class="p-3 bg-gray-200 rounded-lg">
+                        <p class="text-gray-700 font-bold">Rival Group: <span x-text="index + 1"></span></p>
+                        <p x-text="'Rivals: ' + registeredPlayers[rival[0]].name + ' vs ' + registeredPlayers[rival[1]].name"></p>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+
+    <!-- Next Button -->
+    <div class="flex justify-end">
+        <button
+        @click="goToNextCard()"
+        class="bg-[#f9ec7a] text-gray-600 px-5 py-2 rounded-lg font-['Braah One'] font-bold hover:bg-green-600"
+        >
+        Next
+        </button>
+    </div>
 </div>
