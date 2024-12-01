@@ -6,22 +6,10 @@
     x-ref="parent"
     x-data="{
         get TimeString() {
-            // const startDate = new Date(Date.parse(this.leg.leg_start_time));
-            // const endDate = new Date(Date.parse(this.team.team_end_time));
-            
-            // let diffMs = endDate - startDate;
-            
-            // if (diffMs < 0) {
-            //     throw new Error('End time must be after start time');
-            // }
-
-            // const totalSeconds = Math.floor(diffMs / 1000);
-            // const hours = Math.floor(totalSeconds / 3600);
-            // const minutes = Math.floor((totalSeconds % 3600) / 60);
-            // const seconds = totalSeconds % 60;
-
-            // return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            return '15:35:90'
+            const hours = Math.floor(this.player.total_time_seconds / 3600);
+            const minutes = Math.floor((this.player.total_time_seconds % 3600) / 60);
+            const seconds = (this.player.total_time_seconds % 60).toFixed(0);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
         }
     }"
     :class="{ 'order-2': index === 0,'order-1': index === 1, 'order-3': index === 2}"
@@ -29,7 +17,7 @@
 >
     <!-- Image and Name Container -->
     <div class="self-stretch flex flex-col justify-start items-start 
-                p-2 sm:p-3 md:p-3 lg:p-4 xl:p-5
+                p-1 sm:p-2 md:p-2 lg:p-3 xl:p-4
                 gap-1 sm:gap-2 md:gap-3 lg:gap-4 xl:gap-5">
         <!-- Image -->
         <div 
@@ -47,36 +35,35 @@
         <div class="w-full flex-col justify-start items-center flex">
             <span 
                 class="text-[#451c3a] font-semibold font-['Inter']
-                       text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl"
+                       text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl"
                 x-text = "player.name"
             />
         </div>
     </div>
-    <!-- Point Container (Actually Unneccessary)-->
-    <div class="w-full flex flex-col justify-start items-center 
+    <!-- Point Container -->
+    <div class="w-full flex flex-col justify-start items-center text-black font-medium font-[Inter] gap-2
                 px-4 sm:px-5 md:px-6 lg:px-7 xl:px-8
-                pb-2 sm:pb-3 md:pb-4 lg:pb-5 xl:pb-6">
+                pb-2 sm:pb-3 md:pb-4 lg:pb-5 xl:pb-6
+                text-sm sm:text-reg md:text-lg lg:text-xl xl:text-2xl">
         <!-- Point Bubble -->
-        <div 
-            class="w-full bg-[#f9ec7a] rounded-full justify-center items-start inline-flex
-                   py-0.5 sm:py-0.5 md:py-1 lg:py-2.5 xl:py-3"
-            style="height: auto; aspect-ratio: 6/1;"
-        >
+        <div class="h-auto">
             <span 
-                class="text-black font-normal font-['Inter']
-                       text-sm sm:text-reg md:text-lg lg:text-xl xl:text-2xl"
+                class="bg-[#f9ec7a] px-2 py-1 rounded-lg shadow-lg" 
                 x-text="player.total_score + ' pts'"
-            />
+                >
+            </span>
         </div>
         <!-- Time Bubble -->
-        <div class="h-auto">
-            <!-- <span 
-                x-show="team.team_end_time" 
-                class="bg-[#f9ec7a] text-black text-xs font-medium font-[Inter] px-2 py-1 rounded-lg shadow-lg" 
+        <div 
+            x-show="player.total_time_seconds > 0"
+            class="h-auto">
+            <span 
+                class="bg-[#f9ec7a] px-2 py-1 rounded-lg shadow-lg" 
                 x-text="TimeString">
-            </span> -->
+            </span>
         </div>
     </div>
+   
     <!-- Podium Container -->
     <div
         class="w-full"

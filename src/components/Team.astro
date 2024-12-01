@@ -34,7 +34,7 @@
     />
 
     <!-- Main Container -->
-    <div class="w-full flex flex-col justify-start items-start gap-1.5">
+    <div class="w-full flex flex-col justify-start items-start gap-1">
         <div class="flex flex-row justify-center items-center gap-3">
             <!-- Team Name -->
             <div 
@@ -55,8 +55,8 @@
         <!-- Player -->
         <div class="flex w-full justify-start items-start gap-2">
             <template x-for="player in team.players" :key="player.player_id">
-                <div class="flex flex-col justify-start items-center gap-0.5 w-1/4">
-                    <div class="w-full rounded-full border border-white p-0.5" >
+                <div class="flex flex-col justify-start items-center gap-0.5">
+                    <div class="w-12 rounded-full border border-white p-0.5" >
                         <img 
                             :src="player.avatar" 
                             alt="Avatar"

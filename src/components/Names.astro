@@ -54,7 +54,7 @@
                 if (response.ok) {
                     const responseData = await response.json()
 
-                    window.location.href = `/dashboard?session_key=${responseData.session_key}`
+                    window.location.href = `/leaderboard?session_key=${responseData.session_key}`
                 } else
                 {
                     console.log('Something went wrong')

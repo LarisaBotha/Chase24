@@ -1,7 +1,8 @@
 <div
     x-data="{
+        confirmAdvance: false
     }"
-    class="w-full flex h-auto bg-[#c671a8] focus:bg-[#a45f8e] items-center inline-flex border border-2 border-[#a45f8e]
+    class="w-full flex h-auto bg-[#c671a8] focus:bg-[#a45f8e] justify-between items-center inline-flex border border-2 border-[#a45f8e]
             rounded-md sm:rounded-lg lg:rounded-xl
             shadow-md sm:shadow-lg lg:shadow-xl shadow-[#90487b]/60
             py-1 sm:py-2 md:py-3 lg:py-4 xl:py-5
@@ -23,7 +24,7 @@
         <div class="flex w-full justify-start items-start gap-2">
             <template x-for="player in team.players" :key="player.player_id">
                 <div class="flex flex-col justify-start items-center gap-0.5 w-1/3">
-                    <div class="w-full rounded-full border border-white p-0.25" >
+                    <div class="w-14 rounded-full border border-white p-0.25" >
                         <img 
                             :src="player.avatar" 
                             alt="Avatar"
@@ -41,7 +42,7 @@
     
     <!-- Advance Button -->
     <button 
-        @click="onClick"
+        @click="confirmAdvance = true;"
         class="w-full text-white focus:text-gray-200 font-bold flex justify-end items-center transition duration-300"
     >
         <template x-for="(n, index) in Array.from({ length: (team.team_task_count) })" :key="index">
@@ -55,4 +56,28 @@
             </svg>
         </template>
     </button>
+
+    <!-- Confirmation Popup -->
+    <div 
+        x-show="confirmAdvance" 
+        @click.away="confirmAdvance = false" 
+        class="absolute bg-gray-800 bg-opacity-90 text-white rounded-lg p-4 shadow-lg flex flex-col gap-3 items-center justify-center"
+        style="top: 50%; left: 50%; transform: translate(-50%, -50%);"
+    >
+        <p class="text-lg font-bold">Are you sure you want to advance team <span x-text="team.team_name"></span>?</p>
+        <div class="flex gap-4">
+            <button 
+                @click="onClick" 
+                class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+            >
+                Yes
+            </button>
+            <button 
+                @click="confirmAdvance = false" 
+                class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded"
+            >
+                No
+            </button>
+        </div>
+    </div>
 </div>

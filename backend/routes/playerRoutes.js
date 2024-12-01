@@ -7,64 +7,29 @@ const router = express.Router();
 export const fetchSortedPlayersBySession = async (session_key) => {
   try {
     const result = await pool.query(
-      `SELECT players.name, 
-              players.avatar,
-              SUM(COALESCE(teams.score, (SELECT COUNT(*) + 1 
-                                         FROM teams 
-                                         WHERE teams.leg_id = teams.leg_id))) AS total_score,
-              SUM(teams.task_count) AS task_count,
-              SUM(EXTRACT(EPOCH FROM (teams.end_time - legs.start_time))) AS total_time_seconds
-       FROM players
-       JOIN player_teams ON players.id = player_teams.player_id
-       JOIN teams ON player_teams.team_id = teams.id
-       JOIN legs ON teams.leg_id = legs.id
-       WHERE players.session_key = $1
-       GROUP BY players.name, players.avatar
-       ORDER BY total_score ASC;`,
+      `
+      SELECT 
+          players.name, 
+          players.avatar,
+          SUM(COALESCE(teams.score, (SELECT COUNT(*) + 1 
+                                     FROM teams 
+                                     WHERE teams.leg_id = teams.leg_id))) AS rank_var,
+          SUM(teams.task_count) AS task_count,
+          SUM(EXTRACT(EPOCH FROM (teams.end_time - legs.start_time))) AS total_time_seconds,
+          SUM(CASE 
+            WHEN teams.end_time IS NOT NULL THEN COALESCE(teams.score, 0)
+            ELSE 0
+          END) AS total_score
+      FROM players
+      JOIN player_teams ON players.id = player_teams.player_id
+      JOIN teams ON player_teams.team_id = teams.id
+      JOIN legs ON teams.leg_id = legs.id
+      WHERE players.session_key = $1
+      GROUP BY players.name, players.avatar
+      ORDER BY rank_var ASC, task_count DESC, total_time_seconds ASC, total_score ASC
+      `,
       [session_key]
     );
-    // const result = await pool.query(
-    //   `WITH active_leg AS (
-    //       SELECT legs.id
-    //       FROM legs
-    //       JOIN teams ON teams.leg_id = legs.id
-    //       WHERE teams.task_count >= 1
-    //       GROUP BY legs.id
-    //       HAVING COUNT(*) FILTER (WHERE teams.end_time IS NULL) > 0
-    //       ORDER BY legs.id ASC
-    //       LIMIT 1
-    //   )
-    //   SELECT players.name, 
-    //          players.avatar,
-    //          SUM(CASE 
-    //                WHEN EXISTS (
-    //                     SELECT 1 
-    //                     FROM teams AS t 
-    //                     WHERE t.leg_id = legs.id 
-    //                       AND (t.end_time IS NOT NULL OR legs.id = (SELECT id FROM active_leg))
-    //                )
-    //                THEN COALESCE(teams.score, (SELECT COUNT(*) + 1 
-    //                                            FROM teams 
-    //                                            WHERE teams.leg_id = teams.leg_id))
-    //                ELSE 0
-    //              END) AS total_score,
-    //          SUM(teams.task_count) AS task_count,
-    //          SUM(
-    //              CASE 
-    //                WHEN teams.end_time IS NOT NULL OR legs.id = (SELECT id FROM active_leg)
-    //                THEN EXTRACT(EPOCH FROM (teams.end_time - legs.start_time))
-    //                ELSE 0
-    //              END
-    //          ) AS total_time_seconds
-    //   FROM players
-    //   JOIN player_teams ON players.id = player_teams.player_id
-    //   JOIN teams ON player_teams.team_id = teams.id
-    //   JOIN legs ON teams.leg_id = legs.id
-    //   WHERE players.session_key = $1
-    //   GROUP BY players.name, players.avatar
-    //   ORDER BY total_score ASC;`,
-    //   [session_key]
-    // );
 
     const players = result.rows;
 
@@ -80,7 +45,7 @@ export const fetchSortedPlayersBySession = async (session_key) => {
     // Group players array by score
     players.forEach(player => {
       // If it should be part of the current grouping (By Total Score)
-      if (player.total_score === prev) {
+      if (player.rank_var === prev) {
         currentGroup.push(player);
       } else {
         // Push the previous group if it exists
@@ -92,7 +57,7 @@ export const fetchSortedPlayersBySession = async (session_key) => {
         
         // Start a new group
         currentGroup = [player];
-        prev = player.total_score;
+        prev = player.rank_var;
       }
     });
 
@@ -181,5 +146,6 @@ export const fetchSortedPlayersBySession = async (session_key) => {
     throw error;
   }
 };
+
 
 export default router;
