@@ -25,8 +25,6 @@ import PlayerLeaderboard from '../components/player_leaderboard.astro'
           this.players = JSON.parse(data.players);
           this.leg = JSON.parse(data.leg);
           this.teams =  this.leg.teams;
-          console.log(this.players);
-          console.log(this.leg);
 
           this.topPlayers = this.players.slice(0, 3); // Get top 3 players
           this.otherPlayers = this.players.slice(3); // Get remaining players

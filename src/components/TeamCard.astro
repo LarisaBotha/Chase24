@@ -33,8 +33,6 @@
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         },
         async nextTask() {
-            console.log(this.Progress);
-            console.log(this.LastLeg);
             try {
                 const response = await fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/advance`, {
                 method: 'POST',
