@@ -1,5 +1,6 @@
 import express from 'express';
 import pool from '../db.js';
+import { sendUpdateToSessionClients } from '../server.js'
 
 const router = express.Router();
 
@@ -32,6 +33,8 @@ router.post('/start', async (req, res) => {
         );
 
         await pool.query('COMMIT');
+
+        sendUpdateToSessionClients(session_key);
 
         res.json({ message: 'Leg started', leg: legResult.rows[0] });
     } catch (error) {

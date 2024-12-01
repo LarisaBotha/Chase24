@@ -277,18 +277,20 @@ router.post('/Advance', async (req, res) => {
 
     // Re-rank teams in the same leg based on task_count
     await pool.query(
-      `WITH ranked_teams AS (
-         SELECT id,
-                ROW_NUMBER() OVER (
-                  ORDER BY task_count DESC  -- Higher task count ranks higher
-                ) AS rank
-         FROM teams
-         WHERE leg_id = $1
-       )
-       UPDATE teams
-       SET score = ranked_teams.rank
-       FROM ranked_teams
-       WHERE teams.id = ranked_teams.id;`,
+    `
+      WITH ranked_teams AS (
+        SELECT id,
+              ROW_NUMBER() OVER (
+                ORDER BY task_count DESC, score ASC, id ASC
+              ) AS new_rank
+        FROM teams
+        WHERE leg_id = $1
+      )
+      UPDATE teams
+      SET score = ranked_teams.new_rank
+      FROM ranked_teams
+      WHERE teams.id = ranked_teams.id;
+          `,
       [leg_id]
     );
 
