@@ -12,7 +12,7 @@ import Team from '../components/Team.astro';
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({leg_id: leg.leg_id}) 
+          body: JSON.stringify({leg_id: leg.leg_id, session_key: sessionKey}) 
         });
        
         if (response.ok){

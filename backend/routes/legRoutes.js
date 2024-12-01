@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Start a leg
 router.post('/start', async (req, res) => {
-    const { leg_id } = req.body;
+    const { leg_id, session_key } = req.body;
 
     try {
         await pool.query('BEGIN');
