@@ -160,8 +160,8 @@ import PlayerLeaderboard from '../components/player_leaderboard.astro'
     <!-- Penalty Modal -->
     <div 
       x-show="penalty" 
-      @keydown.escape.window="penalty=false" 
-      class="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      x-on:click="penalty=false"
+      class="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 m-2"
     >
       <div class="bg-white rounded-lg p-6 shadow-lg">
         <h2 class="text-xl font-bold mb-4">Apply Penalty</h2>
