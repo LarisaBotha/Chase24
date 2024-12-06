@@ -36,7 +36,7 @@ router.post('/create', async (req, res) => {
     })
   }
 
-  const session_key = generateSessionKey();
+  const session_key = "ognl24"; //generateSessionKey();
 
   try {
       // Start the transaction
@@ -51,7 +51,7 @@ router.post('/create', async (req, res) => {
       // Create an array of player name and session key tuples
       const player_values = players.map(player => [player.name, player.avatar, session_key]);
 
-      console.log(player_values);
+      // console.log(player_values);
 
       // Format the query for bulk insertion using pg-format
       const playerInsertQuery = format(`
@@ -86,7 +86,7 @@ router.post('/create', async (req, res) => {
           return [player1_id, player2_id];
         });
 
-        console.log(rival_values);
+        // console.log(rival_values);
 
         // Insert Rivalries
         const rivalInsertQuery = format(`

@@ -8,11 +8,43 @@ import PlayerLeaderboard from '../components/player_leaderboard.astro'
   <div
     x-data="{ 
       group: false,
+      penalty: false,
       sessionKey: '', 
       players: [], 
       teams: [],
       topPlayers: [], 
       otherPlayers: [], 
+      // Select a Team
+      selectTeam(team) {
+        this.selectedTeam = team;
+      },
+      selectedTeam: null,
+      penaltyTime: null,
+      // Set Penalty Time
+      setPenalty(time) {
+        this.penaltyTime = time;
+      },
+      applyPenalty() {
+        if (this.selectedTeam && this.penaltyTime) {
+          fetch(`${this.apiProtocol}${this.apiUrl}/api/teams/ApplyPenalty`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              team_id: this.selectedTeam.team_id,
+              penalty_time: this.penaltyTime,
+              session_key: this.sessionKey
+            }),
+          })
+          .then(data => {
+            this.penalty = false;
+          })
+          .catch(error => {
+            console.error('Error applying penalty:', error);
+          });
+        }
+      },
       connectWebSocket() {
         // Initialize WebSocket connection
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
@@ -49,58 +81,140 @@ import PlayerLeaderboard from '../components/player_leaderboard.astro'
     class="h-full w-full"
   >
 
-  <button 
-    class="absolute top-2 right-2 z-10 bg-[#f9ec7a] hover:bg-gray-200 active:bg-[#f9ec7a] focus:outline-none 
-          rounded-lg p-2 shadow-md text-gray-700 hover:text-gray-800 
-          active:text-gray-700 selection:bg-transparent"
-    aria-label="User Profile"
-    x-on:click="group=!group"
-  >
-    <template x-if="!group">
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        fill="none" 
-        color="currentColor" 
-        class="shrink-0 h-6 w-6" 
-        role="img" 
-        aria-label="users group outline" 
-        viewBox="0 0 24 24"
-      >
-        <path 
-          stroke="currentColor" 
-          stroke-linecap="round" 
-          stroke-width="2" 
-          d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+    <button 
+      class="absolute top-2 right-2 z-10 bg-[#f9ec7a] hover:bg-gray-200 active:bg-[#f9ec7a] focus:outline-none 
+            rounded-lg p-2 shadow-md text-gray-700 hover:text-gray-800 
+            active:text-gray-700 selection:bg-transparent"
+      aria-label="User Profile"
+      x-on:click="group=!group"
+    >
+      <template x-if="!group">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          color="currentColor" 
+          class="shrink-0 h-6 w-6" 
+          role="img" 
+          aria-label="users group outline" 
+          viewBox="0 0 24 24"
         >
-        </path>
-      </svg>
-    </template>
-    <template x-if="group">
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        fill="none" 
-        color="currentColor" 
-        class="shrink-0 h-6 w-6" 
-        role="img" 
-        aria-label="user outline" 
-        viewBox="0 0 24 24"
-      >
-        <path 
-          stroke="currentColor" 
-          stroke-width="2" 
-          d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+          <path 
+            stroke="currentColor" 
+            stroke-linecap="round" 
+            stroke-width="2" 
+            d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+          >
+          </path>
+        </svg>
+      </template>
+      <template x-if="group">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          color="currentColor" 
+          class="shrink-0 h-6 w-6" 
+          role="img" 
+          aria-label="user outline" 
+          viewBox="0 0 24 24"
         >
-        </path>
-      </svg>
-    </template>
-  </button>
+          <path 
+            stroke="currentColor" 
+            stroke-width="2" 
+            d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+          >
+          </path>
+        </svg>
+      </template>
+    </button>
 
-
+    <button 
+      class="absolute top-2 left-2 z-10 bg-[#FDBA74] hover:bg-gray-200 active:bg-[#f9ec7a] focus:outline-none 
+      rounded-lg p-2 shadow-md text-gray-700 hover:text-gray-800 
+      active:text-gray-700 selection:bg-transparent"
+      aria-label="Error Notification"
+      x-on:click="penalty = true"
+    >
+        <svg class="h-6 w-6" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27.963 27.963">
+          <g>
+            <g id="c129_exclamation">
+              <path d="M13.983,0C6.261,0,0.001,6.259,0.001,13.979c0,7.724,6.26,13.984,13.982,13.984s13.98-6.261,13.98-13.984
+                C27.963,6.259,21.705,0,13.983,0z M13.983,26.531c-6.933,0-12.55-5.62-12.55-12.553c0-6.93,5.617-12.548,12.55-12.548
+                c6.931,0,12.549,5.618,12.549,12.548C26.531,20.911,20.913,26.531,13.983,26.531z"/>
+              <polygon points="15.579,17.158 16.191,4.579 11.804,4.579 12.414,17.158 		"/>
+              <path d="M13.998,18.546c-1.471,0-2.5,1.029-2.5,2.526c0,1.443,0.999,2.528,2.444,2.528h0.056c1.499,0,2.469-1.085,2.469-2.528
+                C16.441,19.575,15.468,18.546,13.998,18.546z"/>
+            </g>
+            <g id="Capa_1_207_">
+            </g>
+          </g>
+        </svg>
+    </button>
+    
     <template x-if="group">
       <TeamLeaderboard />
     </template>
     <template x-if="!group">
       <PlayerLeaderboard />
     </template>
+
+    <!-- Penalty Modal -->
+    <div 
+      x-show="penalty" 
+      @keydown.escape.window="penalty=false" 
+      class="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+    >
+      <div class="bg-white rounded-lg p-6 shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Apply Penalty</h2>
+        
+        <!-- Display Selected Team -->
+        <div class="mb-4 text-center">
+          <p class="text-sm text-gray-600" x-show="selectedTeam">
+            Selected Team: <strong x-text="selectedTeam.team_name"></strong>
+          </p>
+          <p class="text-sm text-gray-600" x-show="penaltyTime !== null">
+            Penalty Time: <strong x-text="penaltyTime + ' Minutes'"></strong>
+          </p>
+        </div>
+    
+        <!-- Team Buttons -->
+        <div class="mb-4 space-y-2">
+          <template x-for="(team, team_index) in teams" :key="team.team_id">
+            <button 
+              class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg"
+              :class="selectedTeam?.team_id === team.team_id ? 'bg-blue-300' : ''"
+              @click="selectTeam(team)">
+              <span x-text="team.team_name"></span>
+            </button>
+          </template>
+        </div>
+    
+        <!-- Penalty Buttons -->
+        <div class="flex space-x-4 mb-4">
+          <button 
+            class="penalty-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+            :class="penaltyTime === 10 ? 'ring ring-blue-300' : ''"
+            @click="setPenalty(10)">10 Min</button>
+          <button 
+            class="penalty-btn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
+            :class="penaltyTime === 20 ? 'ring ring-yellow-300' : ''"
+            @click="setPenalty(20)">20 Min</button>
+          <button 
+            class="penalty-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+            :class="penaltyTime === 30 ? 'ring ring-red-300' : ''"
+            @click="setPenalty(30)">30 Min</button>
+        </div>
+    
+        <!-- Apply Penalty Button -->
+        <button 
+          class="w-full apply-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          @click="applyPenalty"
+          :disabled="!selectedTeam || !penaltyTime">
+          Apply Penalty
+        </button>
+    
+        <!-- Close Button -->
+        <button @click="penalty=false" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
+      </div>
+    </div>
   </div>
 </Layout>

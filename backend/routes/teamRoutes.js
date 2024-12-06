@@ -187,14 +187,82 @@ router.get('/AllForSession', async (req, res) => {
   }
 });
 
+// router.post('/Stop', async (req, res) => {
+//   const { team_id } = req.body;
+
+//   try {
+//     // Set the end_time for the specified team
+//     const result = await pool.query(
+//       `UPDATE teams
+//        SET end_time = NOW()
+//        WHERE id = $1
+//        RETURNING leg_id;`,
+//       [team_id]
+//     );
+
+//     if (result.rowCount === 0) {
+//       return res.status(404).json({ message: 'Team not found' });
+//     }
+
+//     const leg_id = result.rows[0].leg_id;
+
+//     // Recalculate scores for all teams in the same leg
+//     await pool.query(
+//       `WITH ranked_teams AS (
+//          SELECT id,
+//                 ROW_NUMBER() OVER (
+//                   ORDER BY 
+//                     end_time ASC NULLS LAST,
+//                     task_count DESC,
+//                     id ASC
+//                 ) AS rank
+//          FROM teams
+//          WHERE leg_id = $1
+//        )
+//        UPDATE teams
+//        SET score = ranked_teams.rank
+//        FROM ranked_teams
+//        WHERE teams.id = ranked_teams.id;`,
+//       [leg_id]
+//     );
+
+//     // Retrieve the session_key associated with the team
+//     const sessionQuery = await pool.query(
+//       `SELECT players.session_key 
+//        FROM players 
+//        JOIN player_teams ON players.id = player_teams.player_id
+//        JOIN teams ON player_teams.team_id = teams.id
+//        WHERE teams.id = $1
+//        LIMIT 1`,
+//       [team_id]
+//     );
+
+//     if (sessionQuery.rows.length === 0) {
+//       return res.status(404).send('Session not found for the specified team');
+//     }
+
+//     const session_key = sessionQuery.rows[0].session_key;
+
+//     sendUpdateToSessionClients(session_key); // Send update with session context
+
+//     // Await the result of the async function
+//     const data = await fetchSortedActiveTeamsBySession(session_key);
+
+//     // Return the data in the response
+//     res.json(JSON.parse(data));
+//   } catch (error) {
+//     console.error('Error executing query', error.stack);
+//     res.status(500).send('Error stopping team');
+//   }
+// });
 router.post('/Stop', async (req, res) => {
   const { team_id } = req.body;
 
   try {
-    // Set the end_time for the specified team
+    // Set the end_time for the specified team, adjusted with penalty_minutes
     const result = await pool.query(
       `UPDATE teams
-       SET end_time = NOW()
+       SET end_time = NOW() + (penalty_minutes || ' minutes')::interval
        WHERE id = $1
        RETURNING leg_id;`,
       [team_id]
@@ -255,6 +323,7 @@ router.post('/Stop', async (req, res) => {
     res.status(500).send('Error stopping team');
   }
 });
+
 
 router.post('/Advance', async (req, res) => {
   const { team_id } = req.body;
@@ -322,6 +391,46 @@ router.post('/Advance', async (req, res) => {
   } catch (error) {
     console.error('Error executing query', error.stack);
     res.status(500).send('Error advancing team task count');
+  }
+});
+
+// Apply penalty to a team
+router.post('/ApplyPenalty', async (req, res) => {
+  const { team_id, penalty_time, session_key } = req.body;
+
+  try {
+      // Validate inputs
+      if (!team_id || isNaN(team_id)) {
+          return res.status(400).json({ error: "Invalid or missing 'teamId'." });
+      }
+      if (!penalty_time || isNaN(penalty_time)) {
+          return res.status(400).json({ error: "Invalid or missing 'penaltyTime'." });
+      }
+
+      // Update the penalty_minutes column
+      const result = await pool.query(
+          `UPDATE teams
+            SET penalty_minutes = COALESCE(penalty_minutes, 0) + $1
+            WHERE id = $2
+            RETURNING id, penalty_minutes`,
+          [penalty_time, team_id]
+      );
+
+      // Check if the update was successful
+      if (result.rowCount === 0) {
+          return res.status(404).json({ error: "Team not found." });
+      }
+
+      sendUpdateToSessionClients(session_key); // Send update with session context
+
+      // Return the updated team data
+      res.status(200).json({
+          message: "Penalty time successfully added.",
+          team: result.rows[0],
+      });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error." });
   }
 });
 
