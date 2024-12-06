@@ -36,7 +36,7 @@ router.post('/create', async (req, res) => {
     })
   }
 
-  const session_key = "ognl24"; //generateSessionKey();
+  const session_key = generateSessionKey();
 
   try {
       // Start the transaction
