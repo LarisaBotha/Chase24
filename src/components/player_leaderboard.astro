@@ -3,37 +3,37 @@ import Player from '../components/Player.astro';
 import TopPlayer from '../components/TopPlayer.astro';
 ---
 
-<div class="flex flex-col">
+<div>
     <!-- Leader Container -->
     <div class="w-full h-full px-3 justify-center items-end inline-flex pt-2">
 
-        <!-- First ellipse (XL)
+        <!-- First ellipse (XL) -->
         <div class="absolute rounded-full border-2 border-white opacity-40" 
             style="width: 120%; height: auto; aspect-ratio: 1/1; top: 30%; left: 50%; transform: translate(-50%, -50%); z-index: -1;">
             <div class="w-full h-full bg-white rounded-full opacity-40"/>
         </div>
 
-        Second ellipse (L)
+        <!-- Second ellipse (L) -->
         <div class="absolute rounded-full border-2 border-white opacity-40" 
             style="width: 90%; height: auto; aspect-ratio: 1/1; top: 30%; left: 50%; transform: translate(-50%, -50%); z-index: -2;">
             <div class="w-full h-full bg-white rounded-full opacity-40"/>
         </div>
 
-        Third ellipse (M)
+        <!-- Third ellipse (M) -->
         <div class="absolute rounded-full border-2 border-white opacity-40" 
             style="width: 60%; height: auto; aspect-ratio: 1/1; top: 30%; left: 50%; transform: translate(-50%, -50%); z-index: -3;">
             <div class="w-full h-full bg-white rounded-full opacity-40"/>
         </div>
 
-        Fourth ellipse (S)
+        <!-- Fourth ellipse (S) -->
         <div class="absolute rounded-full border-2 border-white opacity-40" 
             style="width: 30%; height: auto; aspect-ratio: 1/1; top: 30%; left: 50%; transform: translate(-50%, -50%); z-index: -4;">
             <div class="w-full h-full bg-white rounded-full opacity-40"/>
-        </div> -->
+        </div>
 
-        <template x-for="(player, index) in topPlayers" :key="index">
+        <!-- <template x-for="(player, index) in topPlayers" :key="index">
             <TopPlayer />
-        </template>
+        </template> -->
     </div>
 
     <!-- Rank Container -->
